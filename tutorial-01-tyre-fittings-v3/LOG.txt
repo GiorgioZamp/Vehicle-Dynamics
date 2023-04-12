@@ -1,2 +1,5 @@
 11/04 Starting Combined Slip Longitudinal Force
 12/04 Combined fit for 0°,3° works, 6° doesn't. G weights flat tells me there's something wrong
+12/04 Completed Combined Slip: Problems in fitting for alpha=6°;
+	 Plotted Gxa weighting functions;
+	 Created Lateral Force Script

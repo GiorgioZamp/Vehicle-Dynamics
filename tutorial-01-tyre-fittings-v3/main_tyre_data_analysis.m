@@ -660,7 +660,6 @@ ALPHA_vec = TData6.SA;
 KAPPA_vec = TData6.SL;
 FX_vec    = TData6.FX;
 
-%options = optimoptions('fmincon',)
 [P_pure,~,~] = fmincon(@(P)resid_pure_Fx(P,FX_vec,KAPPA_vec,0,FZ0,tyre_coeffs),...
                                P0,[],[],[],[],lb,ub);
 
@@ -706,38 +705,53 @@ legend('Raw $\alpha$=0 deg','Fitted $\alpha$=0 deg','Raw $\alpha$=3 deg',...
     'Fitted $\alpha$=3 deg','Raw $\alpha$=6 deg','Fitted $\alpha$=6 deg',Location='best')
 title('Combined Slip Longitudinal Force')
 
-%% Plot Weights G - NOT WORKING
+%% Plot Weights G Behaviour
 
-sa = [0,3,6,10,20]*pi/180;
-Gxa_k = zeros(length(sa),length(KAPPA_vec));
+sa = [0,3,6,10,20]; % side slip in radians
+sl = linspace(-1,1,1e4);   % longitudinal slip
+
+Gxa_k = zeros(length(sa),length(sl));
 for i = 1:length(sa)
-    for j = 1:length(KAPPA_vec)
-        Gxa_k(i,j) = MF96_FXFYCOMB_coeffs(KAPPA_vec(j), sa(i), 0, FZ0, tyre_coeffs); %alpha row, k column
+    for j = 1:length(sl)
+        Gxa_k(i,j) = MF96_FXFYCOMB_coeffs(sl(j), sa(i)*pi/180, 0, FZ0, tyre_coeffs); %alpha row, k column
     end
 end
 
 figure, grid on, hold on;
-for i = 1:length(sa)
-    plot(TData3.SL,Gxa_k(i,:))
-end
+plot(sl,Gxa_k)
 xlabel('longitudinal slip $k$(-)')
 ylabel('$G_{xa}(-)$')
+ylim('padded')
+leg = cell(size(sa));
+for i = 1:length(sa)
+    leg{i} = ['$\alpha$ = ',num2str(sa(i)),' deg'];
+end
+legend(leg,Location="best")
+title('Weighting function $G_{xa}$ as a function of $k$')
 hold off
 
+sa = linspace(-20,20,1e4);
 sl = [0,0.1,0.2,0.5,0.8,1];
-Gxa_a = zeros(length(sl),length(ALPHA_vec));
+Gxa_a = zeros(length(sl),length(sa));
 for i = 1:length(sl)
-    for j = 1:length(ALPHA_vec)
-        Gxa_a(i,j) = MF96_FXFYCOMB_coeffs(sl(i), ALPHA_vec(j), 0, FZ0, tyre_coeffs); % k row, alpha column
+    for j = 1:length(sa)
+        Gxa_a(i,j) = MF96_FXFYCOMB_coeffs(sl(i), sa(j), 0, FZ0, tyre_coeffs); % k row, alpha column
     end
 end
 
 figure, grid on, hold on;
 for i = 1:length(sl)
-    plot(TData3.SA,Gxa_a(i,:))
+    plot(sa,Gxa_a(i,:))
 end
 xlabel('side slip angle $\alpha$(deg)')
 ylabel('$G_{xa}(-)$')
+ylim('padded')
+leg = cell(size(sl));
+for i = 1:length(sl)
+    leg{i} = ['$k$ = ',num2str(sl(i))];
+end
+legend(leg,Location="best")
+title('Weighting function $G_{xa}$ as a function of $\alpha$')
 hold off
 
 
