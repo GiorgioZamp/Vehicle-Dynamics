@@ -662,7 +662,7 @@ FX_vec    = TData6.FX;
 
 %options = optimoptions('fmincon',)
 [P_pure,~,~] = fmincon(@(P)resid_pure_Fx(P,FX_vec,KAPPA_vec,0,FZ0,tyre_coeffs),...
-                               P0,[],[],[],[],lb,ub);
+                               P0,[],[],[],[],lb,ub,options);
 
 % Change tyre data with new optimal values                             
 tyre_coeffs.pCx1 = P_pure(1) ;
