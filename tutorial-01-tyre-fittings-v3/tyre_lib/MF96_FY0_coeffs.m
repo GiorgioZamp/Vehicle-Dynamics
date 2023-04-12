@@ -45,7 +45,7 @@ function [alpha__y, By, Cy, Dy, Ey, SHy, SVy] = MF96_FY0_coeffs(kappa, alpha, ph
   mu__y = (dfz * pDy2 + pDy1) * (-pDy3 * gamma__s ^ 2 + 1) * LMUY;
   Dy = mu__y * Fz;
   Ey = (dfz * pEy2 + pEy1) * (1 - (pEy4 * gamma__s + pEy3) * Sign(alpha__y)) * LEY;
-  Kya = Fz01 * pKy1 * sin(0.2e1 * atan((Fz / Fz01 / pKy2))) * (1 - pKy3 * my_abs(gamma__s)) * LFZ0 * LKA;
+  Kya = Fz01 * pKy1 * sin(0.2e1 * atan((Fz / Fz01 / pKy2))) * (1 - pKy3 * abs(gamma__s)) * LFZ0 * LKA;
   By = Kya / Cy / Dy;
   
  end

@@ -2,7 +2,7 @@
 function [Gxa, Gyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_data)
 
  % precode
-
+  FZ0             = tyre_data.FZ0;
   rBx1            = tyre_data.rBx1;
   rBx2            = tyre_data.rBx2;
   rBy1            = tyre_data.rBy1;
@@ -22,6 +22,7 @@ function [Gxa, Gyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_dat
   LVYK            = tyre_data.LVYK;
   LXA             = tyre_data.LXA;
   LYK             = tyre_data.LYK;
+  mu__y           = 0.7;
   
 
  % main code
