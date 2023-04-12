@@ -64,6 +64,7 @@ ty_data.qHz1            = 0; % qHz1
 ty_data.qHz2            = 0; % qHz2
 ty_data.qHz3            = 0; % qHz3
 ty_data.qHz4            = 0; % qHz4
+ty_data.rBx1            = 0; % rBx1
 ty_data.rBx2            = 0; % rBx2
 ty_data.rBy1            = 0; % rBy1
 ty_data.rBy2            = 0; % rBy2

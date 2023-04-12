@@ -33,7 +33,7 @@ data_set = 'B1464run30';  % pure longitudinal force + combined
 % tread width in inches
 diameter = 18*2.56; % tyre diameter in cm
 Fz0 = 220;   % [N] nominal load is given
-R0  = 0.327; % [m] get from nominal load R0 (m) *** TO BE CHANGED ***
+R0  = diameter/2/100; % [m] get from nominal load R0 (m) *** TO BE CHANGED ***
 
 
 fprintf('Loading dataset ...')

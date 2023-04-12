@@ -20,7 +20,6 @@ function res = resid_comb_Fx(P,fx0,FX,KAPPA,ALPHA,FZ,tyre_data)
     for i=1:length(KAPPA)
        fx  = MF96_FXcomb(fx0(i), KAPPA(i), ALPHA(i), 0, FZ, tmp_tyre_data);
        res = res+(fx-FX(i))^2;
-       %res = res+(fx0/FX(i)-1)^2;
     end
     
     % Compute the residuals
