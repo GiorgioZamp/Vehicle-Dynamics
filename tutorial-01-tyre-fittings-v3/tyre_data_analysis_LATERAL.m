@@ -220,9 +220,7 @@ ylabel('[N]')
 
 % plot_selected_data
 figure('Name','Selected-data')
-plot_selected_data(TData0);
-
-
+plot_selected_data(TData0); % Fy has opposite sign w.r.t. side slip since the test was run in SAE ref frame
 
 FZ0 = mean(TData0.FZ);
 
@@ -233,23 +231,38 @@ ones_vec  = ones(size(TData0.SA));
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣, 𝗉𝖤𝗒𝟣, 𝗉𝖧𝗒𝟣, 𝗉𝖪𝗒𝟣, 𝗉𝖪𝗒𝟤, 𝗉𝖵𝗒1] 
 P0 = [  1,   1,    1,    1,    1,    1,    1  ];
 lb = [  0,   0,    0,    0,    0,    0,    0  ];
-ub = [  1,   1,    1,    1,    0,    1,    10 ];
+ub = [  ];
 
 ALPHA_vec = TData0.SA; % extract for clarity
-FA_vec    = TData0.FY;
+FY_vec    = TData0.FY;
 
-SL_vec = -0.3:0.001:0.3; % vector for magic formula
+SA_vec = -12*to_rad:0.001:12*to_rad; % side slip vector [rad]
 
 % Optimize the coefficients
 [P_fz_nom,~,~] = fmincon(@(P)resid_pure_Fy(P,FY_vec,ALPHA_vec,0,FZ0,tyre_coeffs),...
                                P0,[],[],[],[],lb,ub);
 
+% Update tyre data with new optimal values                             
+tyre_coeffs.pCy1 = P_fz_nom(1) ;
+tyre_coeffs.pDy1 = P_fz_nom(2) ;  
+tyre_coeffs.pEy1 = P_fz_nom(3) ;
+tyre_coeffs.pHy1 = P_fz_nom(4) ;
+tyre_coeffs.pKy1 = P_fz_nom(5) ; 
+tyre_coeffs.pKy2 = P_fz_nom(6) ;
+tyre_coeffs.pVy1 = P_fz_nom(7) ;
 
-
+% Use Magic Formula to compute the fitting function 
+FY0_fz_nom_vec = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)), ...
+                              FZ0.*ones(size(SA_vec)),tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
-
-
+figure('Name','Fy0(Fz0)')
+plot(TData0.SA,TData0.FY,'o')
+hold on
+plot(SA_vec,FY0_fz_nom_vec,'-','LineWidth',2)
+xlabel('$\alpha$ [rad]')
+ylabel('$F_{y0}$ [N]')
+legend('Raw','Fitted')
 
 
 

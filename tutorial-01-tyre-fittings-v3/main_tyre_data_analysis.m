@@ -721,6 +721,7 @@ title('Combined Slip Longitudinal Force')
 
 %% Plot Weights G Behaviour
 
+% Compute Gxa(k)
 sa = [0,3,6,10,20]; % side slip in radians
 sl = linspace(-1,1,1e4);   % longitudinal slip
 
@@ -731,6 +732,7 @@ for i = 1:length(sa)
     end
 end
 
+% Plot Gxa(k)
 figure, grid on, hold on;
 plot(sl,Gxa_k)
 xlabel('longitudinal slip $k$(-)')
@@ -744,6 +746,7 @@ legend(leg,Location="best")
 title('Weighting function $G_{xa}$ as a function of $k$')
 hold off
 
+% Compute Gxa(alpha)
 sa = linspace(-20,20,1e4);
 sl = [0,0.1,0.2,0.5,0.8,1];
 Gxa_a = zeros(length(sl),length(sa));
@@ -753,6 +756,7 @@ for i = 1:length(sl)
     end
 end
 
+% Plot Gxa(alpha)
 figure, grid on, hold on;
 for i = 1:length(sl)
     plot(sa,Gxa_a(i,:))
