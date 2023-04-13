@@ -588,7 +588,7 @@ tyre_coeffs.pKx1 = P_pure(6) ;
 tyre_coeffs.pVx1 = P_pure(7) ;
 
 % Use Magic Formula
-[fx0_vec] = MF96_FX0_vec(SL0_vec, zeros(size(SL0_vec)), zeros(size(SL0_vec)), FZ0.*ones(size(SL0_vec)), tyre_coeffs);
+[fx0_vec] = MF96_FX0_vec(SL_vec, zeros(size(SL_vec)), zeros(size(SL_vec)), FZ0.*ones(size(SL_vec)), tyre_coeffs);
 
 P0 = [0, 0, 0, 0];
 lb = [0, 0, 0, 0];
@@ -603,7 +603,7 @@ tyre_coeffs.rBx2 = P_comb(2) ;
 tyre_coeffs.rCx1 = P_comb(3) ;
 tyre_coeffs.rHx1 = P_comb(4) ;
 
-[fx_SA0_vec] = MF96_FXcomb_vect(fx0_vec, SL0_vec, zeros(size(SL0_vec)), zeros(size(SL0_vec)), FZ0.*ones(size(SL0_vec)), tyre_coeffs);
+[fx_SA0_vec] = MF96_FXcomb_vect(fx0_vec, SL0_vec, zeros(size(SL0_vec)), zeros(size(SL0_vec)), FZ0.*ones(size(SL_vec)), tyre_coeffs);
 
 %% Fit Longitudal Force with Combined Slip for alpha=3°
 

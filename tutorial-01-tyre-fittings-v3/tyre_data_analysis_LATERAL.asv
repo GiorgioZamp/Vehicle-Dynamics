@@ -231,18 +231,12 @@ ones_vec  = ones(size(TData0.SA));
 
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣, 𝗉𝖤𝗒𝟣, 𝗉𝖧𝗒𝟣, 𝗉𝖪𝗒𝟣, 𝗉𝖪𝗒𝟤, 𝗉𝖵𝗒1] 
-P0 = [  1,   1,    1,    1,    1,    1,    1  ];
-lb = [  0,   0,    0,    0,    0,    0,    0  ];
-ub = [  1,   1,    1,    1,    0,    1,    10 ];
+P0 = [  1,   2,    1,    0,    0,    1,    0  ];
+lb = [1,   0.1,   0,   0,  -10,    0,   -10];
+ub = [2,    4,    1,   1,   10,    100,  10];
 
-ALPHA_vec = TData0.SA; % extract for clarity
-FA_vec    = TData0.FY;
 
-SL_vec = -0.3:0.001:0.3; % vector for magic formula
-
-% Optimize the coefficients
-[P_fz_nom,~,~] = fmincon(@(P)resid_pure_Fy(P,FY_vec,ALPHA_vec,0,FZ0,tyre_coeffs),...
-                               P0,[],[],[],[],lb,ub);
+% Fit the coefficients
 
 
 
