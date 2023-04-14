@@ -4,7 +4,6 @@ function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y] = MF96_FY0_coeffs(kappa, al
  % precode
 
   FZ0             = tyre_data.FZ0;
-  Fz01            = tyre_data.Fz01;
   pCy1            = tyre_data.pCy1;
   pDy1            = tyre_data.pDy1;
   pDy2            = tyre_data.pDy2;
@@ -32,20 +31,24 @@ function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y] = MF96_FY0_coeffs(kappa, al
   LMUY            = tyre_data.LMUY;
   LVY             = tyre_data.LVY;
   
+  %Fz01            = tyre_data.Fz01;
+
+
 
  % main code
 
   FZ01 = (LFZ0 * FZ0);
   dfz = Fz / FZ01 - 1;
   gamma__s = (phi * LGAMMAY);
+
   SHy = (dfz * pHy2 + pHy3 * gamma__s + pHy1) * LHY;
   SVy = Fz * (pVy1 + pVy2 * dfz + (dfz * pVy4 + pVy3) * gamma__s) * LVY * LMUY;
   alpha__y = alpha + SHy;
   Cy = pCy1 * LCY;
-  mu__y = (dfz * pDy2 + pDy1) * (-pDy3 * gamma__s ^ 2 + 1) * LMUY;
+  mu__y = (dfz * pDy2 + pDy1) * (-pDy3 * gamma__s .^ 2 + 1) * LMUY;
   Dy = mu__y * Fz;
-  Ey = (dfz * pEy2 + pEy1) * (1 - (pEy4 * gamma__s + pEy3) * Sign(alpha__y)) * LEY;
-  Kya = Fz01 * pKy1 * sin(0.2e1 * atan((Fz / Fz01 / pKy2))) * (1 - pKy3 * abs(gamma__s)) * LFZ0 * LKA;
-  By = Kya / Cy / Dy;
+  Ey = (dfz * pEy2 + pEy1) * (1 - (-pEy4 * gamma__s + pEy3) * Sign(alpha__y)) * LEY; % fixed a minus pEy4
+  Kya = FZ01 * pKy1 * sin(0.2e1 .* atan((Fz / (FZ01*pKy2)))) .* (1 - pKy3 .* abs(gamma__s)) .* LFZ0 .* LKA;
+  By = Kya / (Cy * Dy);
   
  end

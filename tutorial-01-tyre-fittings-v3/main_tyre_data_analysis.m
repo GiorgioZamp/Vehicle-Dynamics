@@ -758,9 +758,7 @@ end
 
 % Plot Gxa(alpha)
 figure, grid on, hold on;
-for i = 1:length(sl)
-    plot(sa,Gxa_a(i,:))
-end
+plot(sa,Gxa_a)
 xlabel('side slip angle $\alpha$(deg)')
 ylabel('$G_{xa}(-)$')
 ylim('padded')

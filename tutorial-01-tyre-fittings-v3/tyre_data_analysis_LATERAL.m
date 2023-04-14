@@ -218,6 +218,9 @@ ylabel('[N]')
  % Extract data for zero slip and camber, and Nominal Load Fz0
 [TData0, ~] = intersect_table_data( GAMMA_0, FZ_220 );
 
+ALPHA_vec = TData0.SA; % extract for clarity
+FY_vec    = TData0.FY;
+
 % plot_selected_data
 figure('Name','Selected-data')
 plot_selected_data(TData0); % Fy has opposite sign w.r.t. side slip since the test was run in SAE ref frame
@@ -227,14 +230,21 @@ FZ0 = mean(TData0.FZ);
 zeros_vec = zeros(size(TData0.SA));
 ones_vec  = ones(size(TData0.SA));
 
+% Guess
+FY0_guess = MF96_FY0_vec(zeros_vec , ALPHA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+
+figure()
+plot(ALPHA_vec,FY_vec,'o')
+hold on
+plot(ALPHA_vec,FY0_guess,'x')
+hold off
+
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣, 𝗉𝖤𝗒𝟣, 𝗉𝖧𝗒𝟣, 𝗉𝖪𝗒𝟣, 𝗉𝖪𝗒𝟤, 𝗉𝖵𝗒1] 
-P0 = [  1,   1,    1,    1,    1,    1,    1  ];
-lb = [  0,   0,    0,    0,    0,    0,    0  ];
+P0 = [1,    1,   0,    0,    10,   0,    0];
+lb = [  ];
 ub = [  ];
 
-ALPHA_vec = TData0.SA; % extract for clarity
-FY_vec    = TData0.FY;
 
 SA_vec = -12*to_rad:0.001:12*to_rad; % side slip vector [rad]
 
@@ -252,19 +262,21 @@ tyre_coeffs.pKy2 = P_fz_nom(6) ;
 tyre_coeffs.pVy1 = P_fz_nom(7) ;
 
 % Use Magic Formula to compute the fitting function 
+%FY0_fz_nom_vec = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, ...
+                             % FZ0.*ones_vec,tyre_coeffs);
 FY0_fz_nom_vec = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)), ...
                               FZ0.*ones(size(SA_vec)),tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
 figure('Name','Fy0(Fz0)')
-plot(TData0.SA,TData0.FY,'o')
+plot(ALPHA_vec,TData0.FY,'o')
 hold on
 plot(SA_vec,FY0_fz_nom_vec,'-','LineWidth',2)
 xlabel('$\alpha$ [rad]')
 ylabel('$F_{y0}$ [N]')
 legend('Raw','Fitted')
 
-
+%%
 
 
 
