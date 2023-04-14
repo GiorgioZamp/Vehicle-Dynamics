@@ -276,7 +276,7 @@ xlabel('$\alpha$ [rad]')
 ylabel('$F_{y0}$ [N]')
 legend('Raw','Fitted')
 
-%%
+%% Fit coefficient with VARIABLE LOAD Fz
 
 
 
