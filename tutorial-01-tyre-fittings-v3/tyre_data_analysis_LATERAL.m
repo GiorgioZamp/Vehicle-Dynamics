@@ -279,7 +279,7 @@ legend('Raw','Fitted')
 %% Fit coefficient with VARIABLE LOAD Fz
 
 % Extract data with variable load
-%[TDataDFz, ~] = intersect_table_data(GAMMA_0);
+%[TDataDFz, ~] = intersect_table_data(SL_0, GAMMA_0);
 TDataDFz = GAMMA_0; % since there's no long slip to intersect with
 
 % Plot extracted data
@@ -288,11 +288,12 @@ TDataDFz = GAMMA_0; % since there's no long slip to intersect with
 
 % Initialise values for parameters to be optimised
 %    [𝗉𝖣𝗒2, 𝗉𝖤𝗒2, pEy3, 𝗉𝖧𝗒2, 𝗉𝖵y2]
-P0 = [1,0,0,0,0];
+% P0 = [1,0,0,0,0];
 %    [pDy2,pEy2,pHy2,pVy2]
-% P0 = [ 1,   1,  1,   0];
-lb = [ -inf, -inf, -inf, -inf, -inf ];
-ub = [ +inf, +inf, +inf, +inf, +inf ];
+P0 = [ 1,   1,  1,   0];
+
+lb = [  ];
+ub = [  ];
 
 ALPHA_vec = TDataDFz.SA; % extract for clarity
 FY_vec    = TDataDFz.FY;
@@ -305,16 +306,16 @@ SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
 % Update tyre data with new optimal values (change them also in resid_pure
 % if you change the parameters
-% tyre_coeffs.pDy2 = P_dfz(1);
-% tyre_coeffs.pEy2 = P_dfz(2);
-% tyre_coeffs.pHy2 = P_dfz(3);
-% tyre_coeffs.pVy2 = P_dfz(4);
-
 tyre_coeffs.pDy2 = P_dfz(1);
 tyre_coeffs.pEy2 = P_dfz(2);
-tyre_coeffs.pEy3 = P_dfz(3);
-tyre_coeffs.pHy2 = P_dfz(4);
-tyre_coeffs.pVy2 = P_dfz(5);
+tyre_coeffs.pHy2 = P_dfz(3);
+tyre_coeffs.pVy2 = P_dfz(4);
+
+% tyre_coeffs.pDy2 = P_dfz(1);
+% tyre_coeffs.pEy2 = P_dfz(2);
+% tyre_coeffs.pEy3 = P_dfz(3);
+% tyre_coeffs.pHy2 = P_dfz(4);
+% tyre_coeffs.pVy2 = P_dfz(5);
 
 
 % Use Magic Formula to compute the fitting function 
@@ -325,7 +326,7 @@ FY0_fz_var_vec4 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),
 FY0_fz_var_vec5 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_1120.FZ).*ones(size(SA_vec)),tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
-figure, hold on, grid on;
+figure('Name','Fy0 vs Fz'), hold on, grid on;
 plot(TDataDFz.SA*to_deg,TDataDFz.FY,'.')
 plot(SA_vec*to_deg,FY0_fz_var_vec1,'-','LineWidth',2)
 plot(SA_vec*to_deg,FY0_fz_var_vec2,'-','LineWidth',2)
@@ -345,10 +346,64 @@ legend(leg,Location="best")
 hold off
 
 %% Fit coefficient with VARIABLE CAMBER
+% Zero longitudinal slip k and fixed normal load Fz
 
+% Extract data with variable camber
+%[TDataGamma, ~] = intersect_table_data(SL_0,FZ_220);
+TDataGamma = FZ_220; % since SL is already zero everywhere
 
+% Initialise values for parameters to be optimised
+%    [pDy3,pEy3,pEy4,pHy3,pKy3,pVy3,pVy4]
+P0 = [ 1,   1,   1,   1,   1,   1,   1  ];
+lb = [];
+ub = [];
 
+ALPHA_vec = TDataGamma.SA; % extract for clarity
+GAMMA_vec = TDataGamma.IA;
+FY_vec    = TDataGamma.FY;
+SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
+% Optimize the coefficients
+[P_varGamma,~,~] = fmincon(@(P)resid_pure_Fy_varGamma(P,FY_vec,ALPHA_vec,GAMMA_vec,tyre_coeffs.FZ0,tyre_coeffs),...
+               P0,[],[],[],[],lb,ub);
 
+% Change tyre data with new optimal values 
+tyre_coeffs.pDy3 = P_varGamma(1);
+tyre_coeffs.pEy3 = P_varGamma(2);
+tyre_coeffs.pEy4 = P_varGamma(3);
+tyre_coeffs.pHy3 = P_varGamma(4);
+tyre_coeffs.pKy3 = P_varGamma(5);
+tyre_coeffs.pVy3 = P_varGamma(6);
+tyre_coeffs.pVy4 = P_varGamma(7);
 
+% Use Magic Formula to compute the fitting function 
+zeros_vec = zeros(size(SA_vec));
+ones_vec  = ones(size(SA_vec));
 
+FY0_varGamma_vec1 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_0.IA).*ones_vec, tyre_coeffs.FZ0*ones_vec,tyre_coeffs);
+FY0_varGamma_vec2 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_1.IA).*ones_vec, tyre_coeffs.FZ0*ones_vec,tyre_coeffs);
+FY0_varGamma_vec3 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_2.IA).*ones_vec, tyre_coeffs.FZ0*ones_vec,tyre_coeffs);
+FY0_varGamma_vec4 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_3.IA).*ones_vec, tyre_coeffs.FZ0*ones_vec,tyre_coeffs);
+FY0_varGamma_vec5 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_4.IA).*ones_vec, tyre_coeffs.FZ0*ones_vec,tyre_coeffs);
+
+% Plot Raw Data and Fitted Function
+figure('Name','Fy0 vs Gamma')
+plot(ALPHA_vec*to_deg,TDataGamma.FY,'.')
+hold on
+plot(SA_vec*to_deg,FY0_varGamma_vec1,'-')
+plot(SA_vec*to_deg,FY0_varGamma_vec2,'-')
+plot(SA_vec*to_deg,FY0_varGamma_vec3,'-')
+plot(SA_vec*to_deg,FY0_varGamma_vec4,'-')
+plot(SA_vec*to_deg,FY0_varGamma_vec5,'-')
+xlabel('$\alpha$ [deg]')
+ylabel('$F_{y0}$ [N]')
+tmp = [0,1,2,3,4];
+leg = cell(length(tmp)+1,1);
+leg{1} = 'Raw Data';
+for i=1:length(tmp)
+leg{i+1} = ['Fitted $\gamma$= ',num2str(tmp(i)),' [°]'];
+end
+legend(leg,Location="best")
+hold off
+
+%% Combined Slip Lateral Force
