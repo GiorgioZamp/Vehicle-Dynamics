@@ -1,10 +1,6 @@
 % Implement the Magic formula
 function [mf_res] = magic_formula(x, B, C, D, E, SV)
 
- % precode
-
-  
-
  % main code
 
   t1 = B * x;

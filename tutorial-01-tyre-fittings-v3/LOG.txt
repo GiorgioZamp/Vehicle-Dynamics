@@ -3,3 +3,4 @@
 12/04 Completed Combined Slip: Problems in fitting for alpha=6°;
 	 Plotted Gxa weighting functions;
 	 Created Lateral Force Script
+13/04 Fixed Fx combined fitting. Working on Lateral Pure
