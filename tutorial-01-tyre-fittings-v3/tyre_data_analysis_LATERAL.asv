@@ -287,12 +287,12 @@ TDataDFz = GAMMA_0; % since there's no long slip to intersect with
 % plot(TDataDFz.SA*to_deg,TDataDFz.FY,'.')
 
 % Initialise values for parameters to be optimised
-%    [𝗉𝖣𝗒2, 𝗉𝖤𝗒2, pEy3, 𝗉𝖧𝗒2, 𝗉𝖵y2]
-P0 = [1,0,0,0,0];
+%    [𝗉𝖣𝗒2, pDy3, 𝗉𝖤𝗒2, pEy3, pEy4, 𝗉𝖧𝗒2, pHy3, pKy2, 𝗉𝖵y2, pVy3, pVy4]
+% P0 = [1,0,0,1,0,1,0,0,0,0,0];
 %    [pDy2,pEy2,pHy2,pVy2]
-% P0 = [ 1,   1,  1,   0];
-lb = [ -inf, -inf, -inf, -inf, -inf ];
-ub = [ +inf, +inf, +inf, +inf, +inf ];
+P0 = [ 1,   1,  1,   1];
+lb = [  ];
+ub = [  ];
 
 ALPHA_vec = TDataDFz.SA; % extract for clarity
 FY_vec    = TDataDFz.FY;
@@ -305,17 +305,22 @@ SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
 % Update tyre data with new optimal values (change them also in resid_pure
 % if you change the parameters
-% tyre_coeffs.pDy2 = P_dfz(1);
-% tyre_coeffs.pEy2 = P_dfz(2);
-% tyre_coeffs.pHy2 = P_dfz(3);
-% tyre_coeffs.pVy2 = P_dfz(4);
-
 tyre_coeffs.pDy2 = P_dfz(1);
 tyre_coeffs.pEy2 = P_dfz(2);
-tyre_coeffs.pEy3 = P_dfz(3);
-tyre_coeffs.pHy2 = P_dfz(4);
-tyre_coeffs.pVy2 = P_dfz(5);
+tyre_coeffs.pHy2 = P_dfz(3);
+tyre_coeffs.pVy2 = P_dfz(4);
 
+% tyre_coeffs.pDy2 = P_dfz(1);
+% tyre_coeffs.pDy3 = P_dfz(2);
+% tyre_coeffs.pEy2 = P_dfz(3);
+% tyre_coeffs.pEy3 = P_dfz(4);
+% tyre_coeffs.pEy4 = P_dfz(5);
+% tyre_coeffs.pHy2 = P_dfz(6);
+% tyre_coeffs.pHy3 = P_dfz(7);
+% tyre_coeffs.pKy2 = P_dfz(8);
+% tyre_coeffs.pVy2 = P_dfz(9);
+% tyre_coeffs.pVy3 = P_dfz(10);
+% tyre_coeffs.pVy4 = P_dfz(11);
 
 % Use Magic Formula to compute the fitting function 
 FY0_fz_var_vec1 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_220.FZ).*ones(size(SA_vec)),tyre_coeffs);

@@ -346,12 +346,6 @@ plot(TDataDFz.SL,TDataDFz.FX,'.')
 hold on
 plot(TDataDFz.SL,FX0_guess,'-')
 
-% Plot raw data and initial guess
-% figure()
-% plot(TDataSub.KAPPA,TDataSub.FX,'o')
-% hold on
-% plot(TDataSub.KAPPA,FX0_guess,'x')
-
 % Guess values for parameters to be optimised
 %    [pDx2 pEx2 pEx3 pHx2  pKx2  pKx3  pVx2] 
 P0 = [  0,   0,   0,  0,   0,   0,   0]; 
@@ -413,8 +407,6 @@ FX0_fz_var_vec4 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp
 figure('Name','Fx0(Fz0)')
 plot(TDataDFz.SL,TDataDFz.FX,'o')
 hold on
-%plot(TDataSub.KAPPA,FX0_fz_nom_vec,'-')
-%plot(SL_vec,FX0_dfz_vec,'-','LineWidth',2)
 plot(SL_vec,FX0_fz_var_vec1,'-','LineWidth',2)
 plot(SL_vec,FX0_fz_var_vec2,'-','LineWidth',2)
 plot(SL_vec,FX0_fz_var_vec3,'-','LineWidth',2)
@@ -423,7 +415,7 @@ plot(SL_vec,FX0_fz_var_vec4,'-','LineWidth',2)
 xlabel('$\kappa$ [-]')
 ylabel('$F_{x0}$ [N]')
 
-
+%% Cornering Stiffness
 [kappa__x, Bx, Cx, Dx, Ex, SVx] =MF96_FX0_coeffs(0, 0, 0, mean(FZ_220.FZ), tyre_coeffs);
 Calfa_vec1_0 = magic_formula_stiffness(kappa__x, Bx, Cx, Dx, Ex, SVx);
 [kappa__x, Bx, Cx, Dx, Ex, SVx] =MF96_FX0_coeffs(0, 0, 0, mean(FZ_700.FZ), tyre_coeffs);
