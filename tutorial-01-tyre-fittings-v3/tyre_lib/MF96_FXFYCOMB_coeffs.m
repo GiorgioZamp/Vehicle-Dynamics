@@ -1,5 +1,5 @@
 % Coefficients for Magic Formula Pure Aligning Moment
-function [Gxa, Gyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_data)
+function [Gxa, Gyk, SHyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_data)
 
  % precode
   FZ0             = tyre_data.FZ0;

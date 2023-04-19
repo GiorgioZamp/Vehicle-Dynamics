@@ -20,11 +20,11 @@ to_deg = 180/pi;
 %% Select tyre dataset
 
 % dataset path
-data_set_path = 'TTC_dataset/';
+data_set_path = 'dataset/';
 
 % dataset selection and loading
-%data_set = 'B1464run23'; % pure lateral forces
-data_set = 'B1464run30';  % braking/traction (pure log. force) + combined
+%data_set = 'Hoosier_B1464run23'; % pure lateral forces
+data_set = 'Hoosier_B1464run30';  % braking/traction (pure log. force) + combined
 
 % tyre geometric data:
 % Hoosier	18.0x6.0-10
@@ -230,17 +230,7 @@ ylabel('[rad]')
 [TData0, ~] = intersect_table_data( SA_0, GAMMA_0, FZ_220 );
 % extract data for zero slip and camber, and 220N
 
-%[tableSelectedData, ~] = intersect_table_data( KAPPA_00, GAMMA_00, VX_10 );
-%[TDataSub, ~] = intersect_table_data( ALPHA_00, GAMMA_00, VX_10, FZ_6500 );
-
-%[tableSelectedData, ~] = intersectTableData( KAPPA_00, GAMMA_00, VX_10, FZ_6500 );
-
-% get data for tyre deflection (radius) versus speed
-%[TDataSubRho, ~] = intersectTableData( KAPPA_00, ALPHA_00, GAMMA_00, FZ_6500 );
-
-
 % Plot_selected_data
-
 figure('Name','Selected-data')
 plot_selected_data(TData0);
 
@@ -357,7 +347,7 @@ FX0_fz_var_vec2 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_700.FZ)*tmp_
 FX0_fz_var_vec3 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
 FX0_fz_var_vec4 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
 
-% check guess 
+% Check guess 
 figure('Name', 'Guess')
 plot(TDataDFz.SL,TDataDFz.FX,'.', 'DisplayName', 'Raw')
 hold on
@@ -371,32 +361,14 @@ ylabel('$F_{x0}$ [N]')
 legend('Location','southeast')
 
 % Guess values for parameters to be optimised
-%    [pDx2 pEx2 pEx3 pHx2  pKx2  pKx3  pVx2] 
-P0 = [  0,   0,   0,  0,   0,   0,   0]; 
-
-
-% NOTE: many local minima => limits on parameters are fundamentals
-% Limits for parameters to be optimised {lb: lower_bound, up: upper_bound}
-% 1< pCx1 < 2 
-% 0< pEx1 < 1 
-%    [pCx1 pDx1 pEx1 pEx4  pHx1  pKx1  pVx1 
+%    [pDx2 pEx2 pEx3 pHx2 pKx2 pKx3 pVx2] 
+P0 = [ 0,   0,   0,   0,   0,   0,   0]; 
 lb = [];
 ub = [];
-
 
 KAPPA_vec = TDataDFz.SL;
 FX_vec    = TDataDFz.FX;
 FZ_vec    = TDataDFz.FZ;
-
-% check guess
-SL_vec = -0.3:0.001:0.3;
-FX0_dfz_vec = MF96_FX0_vec(SL_vec,zeros(size(SL_vec)) , zeros(size(SL_vec)), ...
-                           TDataDFz.FZ*ones(size(SL_vec)), tyre_coeffs);
-% 
-% figure
-% plot(KAPPA_vec,FX_vec,'.')
-% hold on
-% plot(SL_vec,FX0_dfz_vec,'.')
 
 
 % LSM_pure_Fx returns the residual, so minimize the residual varying X. It
@@ -718,7 +690,7 @@ tyre_coeffs.rHx1 = P_comb(4) ;
 
 [fx_SA6_vec] = MF96_FXcomb_vect(fx0_vec, SL6_vec, -6*to_rad.*ones(size(SL6_vec)), zeros(size(SL6_vec)), FZ0.*ones(size(SL6_vec)), tyre_coeffs);
 
-%% Plot raw and fitted data together
+% Plot raw and fitted data together
 
 figure, grid on, hold on;
 plot(TData0.SL,TData0.FX,'r.')
@@ -735,58 +707,58 @@ legend('Raw $\alpha$=0 deg','Fitted $\alpha$=0 deg','Raw $\alpha$=-3 deg',...
     'Fitted $\alpha$=-3 deg','Raw $\alpha$=-6 deg','Fitted $\alpha$=-6 deg',Location='southeast')
 title('Combined Slip Longitudinal Force')
 
-%% Plot Weights G Behaviour
+ %% Plot Weights G Behaviour
+% 
+% % Compute Gxa(k)
+% sa = [0,3,6,10,20]; % side slip in radians
+% sl = linspace(-1,1,1e4);   % longitudinal slip
+% 
+% Gxa_k = zeros(length(sa),length(sl));
+% for i = 1:length(sa)
+%     for j = 1:length(sl)
+%         Gxa_k(i,j) = MF96_FXFYCOMB_coeffs(sl(j), sa(i)*to_rad, 0, FZ0, tyre_coeffs); %alpha row, k column
+%     end
+% end
+% 
+% % Plot Gxa(k)
+% figure, grid on, hold on;
+% plot(sl,Gxa_k)
+% xlabel('longitudinal slip $k$(-)')
+% ylabel('$G_{xa}(-)$')
+% ylim('padded')
+% leg = cell(size(sa));
+% for i = 1:length(sa)
+%     leg{i} = ['$\alpha$ = ',num2str(sa(i)),' deg'];
+% end
+% legend(leg,Location="best")
+% title('Weighting function $G_{xa}$ as a function of $k$')
+% hold off
+% 
+% % Compute Gxa(alpha)
+% sa = linspace(-20,20,1e4);
+% sl = [0,0.1,0.2,0.5,0.8,1];
+% Gxa_a = zeros(length(sl),length(sa));
+% for i = 1:length(sl)
+%     for j = 1:length(sa)
+%         Gxa_a(i,j) = MF96_FXFYCOMB_coeffs(sl(i), sa(j), 0, FZ0, tyre_coeffs); % k row, alpha column
+%     end
+% end
+% 
+% % Plot Gxa(alpha)
+% figure, grid on, hold on;
+% plot(sa,Gxa_a)
+% xlabel('side slip angle $\alpha$(deg)')
+% ylabel('$G_{xa}(-)$')
+% ylim('padded')
+% leg = cell(size(sl));
+% for i = 1:length(sl)
+%     leg{i} = ['$k$ = ',num2str(sl(i))];
+% end
+% legend(leg,Location="best")
+% title('Weighting function $G_{xa}$ as a function of $\alpha$')
+% hold off
 
-% Compute Gxa(k)
-sa = [0,3,6,10,20]; % side slip in radians
-sl = linspace(-1,1,1e4);   % longitudinal slip
-
-Gxa_k = zeros(length(sa),length(sl));
-for i = 1:length(sa)
-    for j = 1:length(sl)
-        Gxa_k(i,j) = MF96_FXFYCOMB_coeffs(sl(j), sa(i)*to_rad, 0, FZ0, tyre_coeffs); %alpha row, k column
-    end
-end
-
-% Plot Gxa(k)
-figure, grid on, hold on;
-plot(sl,Gxa_k)
-xlabel('longitudinal slip $k$(-)')
-ylabel('$G_{xa}(-)$')
-ylim('padded')
-leg = cell(size(sa));
-for i = 1:length(sa)
-    leg{i} = ['$\alpha$ = ',num2str(sa(i)),' deg'];
-end
-legend(leg,Location="best")
-title('Weighting function $G_{xa}$ as a function of $k$')
-hold off
-
-% Compute Gxa(alpha)
-sa = linspace(-20,20,1e4);
-sl = [0,0.1,0.2,0.5,0.8,1];
-Gxa_a = zeros(length(sl),length(sa));
-for i = 1:length(sl)
-    for j = 1:length(sa)
-        Gxa_a(i,j) = MF96_FXFYCOMB_coeffs(sl(i), sa(j), 0, FZ0, tyre_coeffs); % k row, alpha column
-    end
-end
-
-% Plot Gxa(alpha)
-figure, grid on, hold on;
-plot(sa,Gxa_a)
-xlabel('side slip angle $\alpha$(deg)')
-ylabel('$G_{xa}(-)$')
-ylim('padded')
-leg = cell(size(sl));
-for i = 1:length(sl)
-    leg{i} = ['$k$ = ',num2str(sl(i))];
-end
-legend(leg,Location="best")
-title('Weighting function $G_{xa}$ as a function of $\alpha$')
-hold off
-
-
+%%
 
 
 
