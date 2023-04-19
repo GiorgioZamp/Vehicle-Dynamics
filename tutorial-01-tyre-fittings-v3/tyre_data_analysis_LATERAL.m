@@ -326,7 +326,7 @@ hold off
 %% Cornering Stiffness
 [alpha__y, By, Cy, Dy, Ey, ~, SVy] =MF96_FY0_coeffs(0, 0, 0, mean(FZ_220.FZ), tyre_coeffs);
 Calfa_vec1_0 = magic_formula_stiffness(alpha__y, By, Cy, Dy, Ey, SVy);
-[alpha__y, By, Cy, Dy, Ey, ~, SVy] =MF96_FY0_coeffs(0, 0, 0, mean(FZ_4400.FZ), tyre_coeffs);
+[alpha__y, By, Cy, Dy, Ey, ~, SVy] =MF96_FY0_coeffs(0, 0, 0, mean(FZ_440.FZ), tyre_coeffs);
 Calfa_vec2_0 = magic_formula_stiffness(alpha__y, By, Cy, Dy, Ey, SVy);
 [alpha__y, By, Cy, Dy, Ey, ~, SVy] =MF96_FY0_coeffs(0, 0, 0, mean(FZ_700.FZ), tyre_coeffs);
 Calfa_vec3_0 = magic_formula_stiffness(alpha__y, By, Cy, Dy, Ey, SVy);
@@ -335,11 +335,14 @@ Calfa_vec4_0 = magic_formula_stiffness(alpha__y, By, Cy, Dy, Ey, SVy);
 [alpha__y, By, Cy, Dy, Ey, ~, SVy] =MF96_FY0_coeffs(0, 0, 0, mean(FZ_1120.FZ), tyre_coeffs);
 Calfa_vec5_0 = magic_formula_stiffness(alpha__y, By, Cy, Dy, Ey, SVy);
 
-Calfa_vec1 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec2 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec3 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec4 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec5 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
+tmp_zeros = zeros(size(SA_vec));
+tmp_ones = ones(size(SA_vec));
+
+Calfa_vec1 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec2 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec3 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec4 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec5 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
 
 figure('Name','C_alpha')
 subplot(2,1,1)
@@ -350,6 +353,8 @@ plot(mean(FZ_440.FZ),Calfa_vec2_0,'+','LineWidth',2)
 plot(mean(FZ_700.FZ),Calfa_vec3_0,'+','LineWidth',2)
 plot(mean(FZ_900.FZ),Calfa_vec4_0,'+','LineWidth',2)
 plot(mean(FZ_1120.FZ),Calfa_vec5_0,'+','LineWidth',2)
+xlabel('$F_z (N)$')
+ylabel('$C_{\alpha} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 
 subplot(2,1,2)
@@ -360,6 +365,8 @@ plot(SA_vec,Calfa_vec2,'-','LineWidth',2)
 plot(SA_vec,Calfa_vec3,'-','LineWidth',2)
 plot(SA_vec,Calfa_vec4,'-','LineWidth',2)
 plot(SA_vec,Calfa_vec5,'-','LineWidth',2)
+xlabel('$\alpha (rad)$')
+ylabel('$C_{\alpha} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 
 %% Fit coefficient with VARIABLE CAMBER
