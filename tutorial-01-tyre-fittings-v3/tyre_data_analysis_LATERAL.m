@@ -274,10 +274,9 @@ TDataDFz = GAMMA_0; % since there's no long slip to intersect with
 
 % Initialise values for parameters to be optimised
 %    [pDy2,pEy2,pHy2,pVy2]
-P0 = [ 1,   1,  0,   0]; % to fix
-
-lb = [  ];
-ub = [  ];
+P0 = [ 0.1,   0.1,  0.1,   0.1]; 
+lb = [ ];
+ub = [ ];
 
 ALPHA_vec = TDataDFz.SA;
 FY_vec    = TDataDFz.FY;

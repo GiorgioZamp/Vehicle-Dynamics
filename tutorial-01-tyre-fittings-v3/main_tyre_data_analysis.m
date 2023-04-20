@@ -525,176 +525,50 @@ fprintf('R-squared = %6.3f\n',1-res_Fx0_varGamma);
 
 
 %% Combined Slip Longitudinal Force
-% Fz=900N, variable alpha, p=12psi, gamma=0
-% 
-% Extract data with variable side slip
-% clear TData0
-% [TData0, ~] = intersect_table_data(SA_0, GAMMA_0, FZ_900);
-% [TData3, ~] = intersect_table_data(SA_3neg, GAMMA_0, FZ_900);
-% [TData6, ~] = intersect_table_data(SA_6neg, GAMMA_0, FZ_900);
-%
- % Fit Longitudal Force with Combined Slip for alpha=0°
-% 
-% SL0_vec = linspace(min(TData0.SL),max(TData0.SL),1e3);
-% % Minimisation
-% P0 = [0, 0, 0, 0, 0, 0, 0];
-% lb = [];
-% ub = [];
-% 
-% zeros_vec = zeros(size(TData0.SL));
-% ones_vec  = ones(size(TData0.SL));
-% 
-% FZ0       = mean(TData0.FZ);
-% % ALPHA_vec = TData0.SA;
-% KAPPA_vec = TData0.SL;
-% FX_vec    = TData0.FX;
-% 
-% 
-% 
-% [P_pure,~,~] = fmincon(@(P)resid_pure_Fx(P,FX_vec,KAPPA_vec,0,FZ0,tyre_coeffs),...
-%     P0,[],[],[],[],lb,ub);
-% 
-% % Change tyre data with new optimal values
-% tyre_coeffs.pCx1 = P_pure(1) ;
-% tyre_coeffs.pDx1 = P_pure(2) ;
-% tyre_coeffs.pEx1 = P_pure(3) ;
-% tyre_coeffs.pEx4 = P_pure(4) ;
-% tyre_coeffs.pHx1 = P_pure(5) ;
-% tyre_coeffs.pKx1 = P_pure(6) ;
-% tyre_coeffs.pVx1 = P_pure(7) ;
-% 
-% % Use Magic Formula
-% [fx0_vec] = MF96_FX0_vec(SL0_vec, zeros(size(SL0_vec)), zeros(size(SL0_vec)), FZ0.*ones(size(SL0_vec)), tyre_coeffs);
-% 
-% P0 = [0, 0, 0, 0];
-% lb = [0, 0, 0, 0];
-% ub = [1, 1, 1, 1];
-% 
-% [P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,fx0_vec,FX_vec,KAPPA_vec,zeros_vec,FZ0,tyre_coeffs),...
-%     P0,[],[],[],[],lb,ub);
-% 
-% % Change tyre data with new optimal values
-% tyre_coeffs.rBx1 = P_comb(1) ;
-% tyre_coeffs.rBx2 = P_comb(2) ;
-% tyre_coeffs.rCx1 = P_comb(3) ;
-% tyre_coeffs.rHx1 = P_comb(4) ;
-% 
-% [fx_SA0_vec] = MF96_FXcomb_vect(fx0_vec, SL0_vec, zeros(size(SL0_vec)), zeros(size(SL0_vec)), FZ0.*ones(size(SL0_vec)), tyre_coeffs);
-% 
-% %% Fit Longitudal Force with Combined Slip for alpha=3°
-% 
-% SL3_vec = linspace(min(TData3.SL),max(TData3.SL),1e3);
-% 
-% % Minimisation
-% P0 = [0, 0, 0, 0, 0, 0, 0];
-% lb = [];
-% ub = [];
-% 
-% zeros_vec = zeros(size(TData3.SL));
-% ones_vec  = ones(size(TData3.SL));
-% 
-% FZ0       = mean(TData3.FZ);
-% % ALPHA_vec = TData3.SA;
-% KAPPA_vec = TData3.SL;
-% FX_vec    = TData3.FX;
-% 
-% 
-% 
-% [P_pure,~,~] = fmincon(@(P)resid_pure_Fx(P,FX_vec,KAPPA_vec,0,FZ0,tyre_coeffs),...
-%     P0,[],[],[],[],lb,ub);
-% 
-% % Change tyre data with new optimal values
-% tyre_coeffs.pCx1 = P_pure(1) ;
-% tyre_coeffs.pDx1 = P_pure(2) ;
-% tyre_coeffs.pEx1 = P_pure(3) ;
-% tyre_coeffs.pEx4 = P_pure(4) ;
-% tyre_coeffs.pHx1 = P_pure(5) ;
-% tyre_coeffs.pKx1 = P_pure(6) ;
-% tyre_coeffs.pVx1 = P_pure(7) ;
-% 
-% % Use Magic Formula
-% [fx0_vec] = MF96_FX0_vec(SL3_vec, -3*to_rad.*ones(size(SL3_vec)),  zeros(size(SL3_vec)), FZ0.*ones(size(SL3_vec)), tyre_coeffs);
-% 
-% 
-% P0 = [0, 0, 0, 0];
-% lb = [0, 0, 0, 0];
-% ub = [1, 1, 1, 1];
-% 
-% [P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,fx0_vec,FX_vec,KAPPA_vec,-3*to_rad*ones_vec,FZ0,tyre_coeffs),...
-%     P0,[],[],[],[],lb,ub);
-% 
-% % Change tyre data with new optimal values
-% tyre_coeffs.rBx1 = P_comb(1) ;
-% tyre_coeffs.rBx2 = P_comb(2) ;
-% tyre_coeffs.rCx1 = P_comb(3) ;
-% tyre_coeffs.rHx1 = P_comb(4) ;
-% 
-% [fx_SA3_vec] = MF96_FXcomb_vect(fx0_vec, SL3_vec, -3*to_rad.*ones(size(SL3_vec)), zeros(size(SL3_vec)), FZ0.*ones(size(SL3_vec)), tyre_coeffs);
-% 
-% %% Fit Longitudal Force with Combined Slip for alpha=-6°
-% 
-% SL6_vec = linspace(min(TData6.SL),max(TData6.SL),1e3);
-% 
-% % Minimisation
-% P0 = [  1,   2,    1,   0,   0,   1,    0 ];
-% lb = [  1,   0.1,  0,   0,  -10,  0,   -10];
-% ub = [  2,   4,    1,   1,   10,  100,  10];
-% 
-% zeros_vec = zeros(size(TData6.SL));
-% ones_vec  = ones(size(TData6.SL));
-% 
-% FZ0       = mean(TData6.FZ);
-% % ALPHA_vec = TData6.SA;
-% KAPPA_vec = TData6.SL;
-% FX_vec    = TData6.FX;
-% 
-% [P_pure,~,~] = fmincon(@(P)resid_pure_Fx(P,FX_vec,KAPPA_vec,0,FZ0,tyre_coeffs),...
-%     P0,[],[],[],[],lb,ub);
-% 
-% % Change tyre data with new optimal values
-% tyre_coeffs.pCx1 = P_pure(1) ;
-% tyre_coeffs.pDx1 = P_pure(2) ;
-% tyre_coeffs.pEx1 = P_pure(3) ;
-% tyre_coeffs.pEx4 = P_pure(4) ;
-% tyre_coeffs.pHx1 = P_pure(5) ;
-% tyre_coeffs.pKx1 = P_pure(6) ;
-% tyre_coeffs.pVx1 = P_pure(7) ;
-% 
-% % Use Magic Formula
-% [fx0_vec] = MF96_FX0_vec(SL6_vec, -6*to_rad.*ones(size(SL6_vec)), zeros(size(SL6_vec)), FZ0.*ones(size(SL6_vec)), tyre_coeffs);
-% 
-% P0 = [1, 1, 1, 1];
-% lb = [0, 0, 0, 0];
-% ub = [1, 1, 1, 1];
-% 
-% [P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,fx0_vec,FX_vec,KAPPA_vec,-6*to_rad.*ones_vec,FZ0,tyre_coeffs),...
-%     P0,[],[],[],[],lb,ub);
-% 
-% % Change tyre data with new optimal values
-% tyre_coeffs.rBx1 = P_comb(1) ;
-% tyre_coeffs.rBx2 = P_comb(2) ;
-% tyre_coeffs.rCx1 = P_comb(3) ;
-% tyre_coeffs.rHx1 = P_comb(4) ;
-% 
-% [fx_SA6_vec] = MF96_FXcomb_vect(fx0_vec, SL6_vec, -6*to_rad.*ones(size(SL6_vec)), zeros(size(SL6_vec)), FZ0.*ones(size(SL6_vec)), tyre_coeffs);
-% 
-% % Plot raw and fitted data together
-% 
-% figure, grid on, hold on;
-% plot(TData0.SL,TData0.FX,'r.')
-% plot(SL0_vec,fx_SA0_vec,'r','LineWidth',1.5)
-% plot(TData3.SL,TData3.FX,'g.')
-% plot(SL3_vec,fx_SA3_vec,'g','LineWidth',1.5)
-% plot(TData6.SL,TData6.FX,'b.')
-% plot(SL6_vec,fx_SA6_vec,'b','LineWidth',1.5)
-% xlabel('long. slip $k(-)$')
-% xlim([min(TData0.SL)-0.01,max(TData6.SL)+0.01])
-% ylabel('$F_x(N)$')
-% ylim('padded')
-% legend('Raw $\alpha$=0 deg','Fitted $\alpha$=0 deg','Raw $\alpha$=-3 deg',...
-%     'Fitted $\alpha$=-3 deg','Raw $\alpha$=-6 deg','Fitted $\alpha$=-6 deg',Location='southeast')
-% title('Combined Slip Longitudinal Force')
+% Fz=220N, variable alpha, p=12psi, gamma=0
+% Fit Longitudal Force with Combined Slip for VARIABLE slip angle ALPHA
+[TDataComb, ~] = intersect_table_data(GAMMA_0, FZ_220);
 
+%Plotting raw data
+figure('Name','Raw Data')
+plot(TDataComb.SL,TDataComb.FX);
+
+% Initialise values for parameters to be optimised
+%[rBx1, rBx2, rCx1, rHx1]
+P0 = [10, 5, 1, 0];
+lb = 0;
+ub = 1;
+
+KAPPAComb_vec = TDataComb.SL; % extract for clarity
+ALPHA_vec = TDataComb.SA;
+
+FX_vec =  MF96_FX0_vec(KAPPAComb_vec, zeros(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
+
+[P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,FX_vec,TDataComb.FX,KAPPAComb_vec,ALPHA_vec,FZ0,tyre_coeffs),...
+                               P0,[],[],[],[],lb,ub);
+
+% Change tyre data with new optimal values                             
+tyre_coeffs.rBx1 = P_comb(1) ; 
+tyre_coeffs.rBx2 = P_comb(2) ;  
+tyre_coeffs.rCx1 = P_comb(3) ;
+tyre_coeffs.rHx1 = P_comb(4) ;
+
+fx_SA0_vec = MF96_FXcomb_vect(FX_vec, KAPPAComb_vec, mean(SA_0.SA).*ones(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
+fx_SA3_vec = MF96_FXcomb_vect(FX_vec, KAPPAComb_vec, mean(SA_3neg.SA).*ones(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
+fx_SA6_vec = MF96_FXcomb_vect(FX_vec, KAPPAComb_vec, mean(SA_6neg.SA).*ones(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
+
+
+figure, grid on, hold on;
+plot(KAPPAComb_vec*to_deg,TDataComb.FX,'.')
+plot(KAPPAComb_vec*to_deg,fx_SA0_vec,'r','LineWidth',1.5)
+plot(KAPPAComb_vec*to_deg,fx_SA3_vec,'g','LineWidth',1.5)
+plot(KAPPAComb_vec*to_deg,fx_SA6_vec,'b','LineWidth',1.5)
+xlabel('long. slip $k(-)$')
+ylabel('$F_x(N)$')
+ylim('padded')
+legend('Raw Data','Fitted $\alpha$=0 deg',...
+    'Fitted $\alpha$=-3 deg','Fitted $\alpha$=-6 deg',Location='southeast')
+title('Combined Slip Longitudinal Force')
 %% Plot Weights G Behaviour
 %
 % % Compute Gxa(k)
