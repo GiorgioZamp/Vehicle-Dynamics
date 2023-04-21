@@ -618,8 +618,6 @@ FY_vec      = TDataMz_tmp.FY;
 GAMMA_vec   = TDataMz_tmp.IA;
 MZ_vec      = TDataMz_tmp.MZ;
 FZ_vec      = TDataMz_tmp.FZ;
-zeros_vec = zeros(size(ALPHA_vec));
-ones_vec = ones(size(ALPHA_vec));
 
 % Guess values for parameters to be optimised
 %  [qHz3, qHz4, qBz4, qBz5, qDz3, qDz4,qEz5, qDz8, qDz9]
