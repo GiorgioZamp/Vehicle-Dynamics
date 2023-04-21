@@ -484,9 +484,9 @@ FX0_varGamma_vec4 = MF96_FX0_vec(KAPPA_vec, zeros_vec , GAMMA_4.IA, tyre_coeffs.
 figure('Name','Fx0(Gamma)')
 plot(KAPPA_vec,TDataGamma.FX,'.', 'DisplayName','Raw')
 hold on
-plot(KAPPA_vec,FX0_varGamma_vec0,'-', 'DisplayName', 'Fitted $\gamma_0$')
-plot(KAPPA_vec,FX0_varGamma_vec2,'-', 'DisplayName', 'Fitted $\gamma_2$')
-plot(KAPPA_vec,FX0_varGamma_vec4,'-', 'DisplayName', 'Fitted $\gamma_4$')
+plot(KAPPA_vec,FX0_varGamma_vec0,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\gamma = 0$')
+plot(KAPPA_vec,FX0_varGamma_vec2,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\gamma = 2$')
+plot(KAPPA_vec,FX0_varGamma_vec4,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\gamma = 4$')
 title('Pure Longitudinal slip at verticle load $F_{z}$ = 220[N], $\alpha = 0$ ')
 xlabel('$\kappa$ [-]')
 ylabel('$F_{x}$ [N]')
@@ -536,8 +536,8 @@ plot(TDataComb.SL,TDataComb.FX);
 % Initialise values for parameters to be optimised
 %[rBx1, rBx2, rCx1, rHx1]
 P0 = [10, 5, 1, 0];
-lb = 0;
-ub = 1;
+lb = [1];
+ub = [10];
 
 KAPPAComb_vec = TDataComb.SL; % extract for clarity
 ALPHA_vec = TDataComb.SA;
