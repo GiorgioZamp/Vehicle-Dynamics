@@ -636,17 +636,65 @@ err = [err ; R2 RMSE];
 % title('Weighting function $G_{xa}$ as a function of $\alpha$')
 % hold off
 
+%% Combined Slip Lateral Force FY
+
+[TDataComb, ~] = intersect_table_data(GAMMA_0, FZ_220);
+
+FY_vec    = TDataComb.FY;
+ALPHA_vec = TDataComb.SA;
+KAPPA_vec = TDataComb.SL;
+FZ_vec    = TDataComb.FZ;
+ones_vec  = ones(size(ALPHA_vec));
+zeros_vec = zeros(size(ALPHA_vec));
+FZ0 = mean(FZ_vec);
 
 
+% Import Pure Slip lateral Force
+Fy0_vec = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, ...
+                               FZ0.*ones_vec,tyre_coeffs);
+
+% Fit Coefficients
+%    [rBy1,rBy2,rBy3,rCy1,rHy1,rVy1,rVy4,rVy5,rVy6]
+P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
+lb = [];
+ub = [];
 
 
+[P_comb,~,~] = fmincon(@(P)resid_comb_Fy(P,Fy0_vec,FY_vec,zeros_vec,ALPHA_vec,FZ0,tyre_coeffs),...
+                               P0,[],[],[],[],lb,ub);
+
+tyre_coeffs.rBy1 = P_comb(1) ;
+tyre_coeffs.rBy2 = P_comb(2) ;
+tyre_coeffs.rBy3 = P_comb(3) ;
+tyre_coeffs.rCy1 = P_comb(4) ;
+tyre_coeffs.rHy1 = P_comb(5) ;
+tyre_coeffs.rVy1 = P_comb(6) ;
+tyre_coeffs.rVy4 = P_comb(7) ;
+tyre_coeffs.rVy5 = P_comb(8) ;
+tyre_coeffs.rVy6 = P_comb(9) ;
 
 
+SA_vec = min(ALPHA_vec):1e-4:max(ALPHA_vec);
+k = [-0.9, -0.5, -0.1, 0, 0.1, 0.5, 0.9];
+
+% Plot Raw and Fitted Data
+figure, grid on, hold on;
+cc = jet(length(k));
+leg = cell(length(k)+1,1);
+leg{1} = 'Raw Data';
+plot(ALPHA_vec*to_deg,FY_vec,'b.')
+for i = 1:length(k)
+    [fy_vec] = MF96_FYcomb_vect(Fy0_vec, k(i), SA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+    leg{i+1} = ['k = ',num2str(k(i))];
+    plot(SA_vec*to_deg,fy_vec,'Color',cc(i,:),'LineWidth',1.5)
+end
+xlabel('$\alpha(°)$ ')
+ylabel('$F_y(N)$')
+legend(leg,Location='best')
+title('Combined Slip Lateral Force')
 
 
 
 
 %% Save tyre data structure to mat file
 % save(['tyre_' data_set,'.mat'],'tyre_coeffs');
-% Load coefficients from lateral test
-load('tyre_Hoosier_B1464run23.mat')

@@ -1,9 +1,9 @@
 % Self Aligning Moment Mz0
-function [Mz0] = MF96_Mz0(fy, SHy, SVy, kappa, alpha, phi, Fz, tyre_data)
+function [Mz0] = MF96_Mz0(fy, kappa, alpha, phi, Fz, tyre_data)
 
  % precode
 
-  [alpha__t, Bt, Ct, Dt, Et, Br, Dr, alpha__r] = MF96_MZ0_coeffs(kappa, alpha, phi, Fz, tyre_data, SHy, SVy);
+  [alpha__t, Bt, Ct, Dt, Et, Br, Dr, alpha__r] = MF96_MZ0_coeffs(kappa, alpha, phi, Fz, tyre_data);
 
  % main code
 
