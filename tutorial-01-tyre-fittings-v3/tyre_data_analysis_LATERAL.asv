@@ -289,8 +289,8 @@ FZ_vec    = TDataDFz.FZ;
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
 % Optimize the coefficients
-[P_dfz,~,~] = fmincon(@(P)resid_pure_Fy_varFz(P,FY_vec,ALPHA_vec,0,FZ_vec,tyre_coeffs),...
-               P0,[],[],[],[],lb,ub);
+% [P_dfz,~,~] = fmincon(@(P)resid_pure_Fy_varFz(P,FY_vec,ALPHA_vec,0,FZ_vec,tyre_coeffs),...
+%                P0,[],[],[],[],lb,ub);
 
 % GlobalSearch
 % ms = MultiStart('FunctionTolerance',2e-4,'UseParallel',true);
