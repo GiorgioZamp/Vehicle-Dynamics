@@ -236,30 +236,31 @@ plot_selected_data(TData0);
 
 % FITTING
 % initialise tyre data
-tyre_coeffs = initialise_tyre_data(R0, Fz0);
-
+% tyre_coeffs = initialise_tyre_data(R0, Fz0);
+% Load coefficients from lateral test
+load('tyre_Hoosier_B1464run23.mat')
 
 % Fitting with Fz=Fz_nom= 220N and camber=0  alpha = 0 VX= 10
 % ------------------
-% Longitudinal slip
+% Logitudinal slip
 
 % Fit the coeffs {pCx1, pDx1, pEx1, pEx4, pKx1, pHx1, pVx1}
 FZ0 = mean(TData0.FZ);
 
-% zeros_vec = zeros(size(TData0.SL));
-% ones_vec  = ones(size(TData0.SL));
+zeros_vec = zeros(size(TData0.SL));
+ones_vec  = ones(size(TData0.SL));
 
-% FX0_guess = MF96_FX0_vec(TData0.SL, zeros_vec , zeros_vec, tyre_coeffs.FZ0*ones_vec, tyre_coeffs);
-% 
-% % check guess
-% figure('Name', 'Guess')
-% plot(TData0.SL,TData0.FX,'.', 'DisplayName', 'Raw')
-% hold on
-% plot(TData0.SL, FX0_guess, '-', 'DisplayName', 'Guess')
-% title('Pure longitudinal slip at $F_{z} = 220 N$, Camber = 0, Slip angle = 0 (Guess)')
-% xlabel('$\kappa$ [-]')
-% ylabel('$F_{x0}$ [N]')
-% legend('Location','southeast')
+FX0_guess = MF96_FX0_vec(TData0.SL, zeros_vec , zeros_vec, tyre_coeffs.FZ0*ones_vec, tyre_coeffs);
+
+% check guess
+figure('Name', 'Guess')
+plot(TData0.SL,TData0.FX,'.', 'DisplayName', 'Raw')
+hold on
+plot(TData0.SL, FX0_guess, '-', 'DisplayName', 'Guess')
+title('Pure longitudinal slip at $F_{z} = 220 N$, Camber = 0, Slip angle = 0 (Guess)')
+xlabel('$\kappa$ [-]')
+ylabel('$F_{x0}$ [N]')
+legend('Location','southeast')
 
 % Plot raw data and initial guess
 % figure()
@@ -268,18 +269,19 @@ FZ0 = mean(TData0.FZ);
 % plot(TDataSub.KAPPA,FX0_guess,'x')
 
 % Guess values for parameters to be optimised
+%    [pCx1 pDx1 pEx1 pEx4  pHx1  pKx1  pVx1
+P0 = [  1,   2,   1,  0,   0,   1,   0];
+
 % NOTE: many local minima => limits on parameters are fundamentals
 % Limits for parameters to be optimised {lb: lower_bound, up: upper_bound}
 % 1< pCx1 < 2
 % 0< pEx1 < 1
-%    [pCx1 pDx1 pEx1 pEx4  pHx1  pKx1  pVx1]
-P0 = [1,   2,   1,   0,    0,    1,    0   ];
-lb = [1,   0.1, 0,   0,   -10,   0,   -10  ];
-ub = [2,   4,   1,   1,    10,   100,  10  ];
+%    [pCx1 pDx1 pEx1 pEx4  pHx1  pKx1  pVx1
+lb = [1,   0.1,   0,   0,  -10,    0,   -10];
+ub = [2,    4,    1,   1,   10,    100,  10];
 
 KAPPA_vec = TData0.SL;
 FX_vec    = TData0.FX;
-FZ_vec    = TData0.FZ;
 
 % check guess
 % SL_vec = -0.3:0.001:0.3;
@@ -322,13 +324,6 @@ xlim([-0.25, 0.21]);
 ylim([-850, 800]);
 legend('Location','southeast')
 
-% Calculate the residuals with the optimal solution found above
-res_Fx0_nom  = resid_pure_Fx(P_fz_nom, FX_vec, KAPPA_vec, 0, FZ0, tyre_coeffs);
-R2 = 1-res_Fx0_nom;
-RMSE = sqrt(res_Fx0_nom*sum(FX_vec.^2)/length(KAPPA_vec));
-fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
-err = [R2 RMSE];
-
 %% Fit coeefficients with VARIABLE LOAD
 % Extract data for zero slip and camber, and Variable load
 [TDataDFz, ~] = intersect_table_data( SA_0, GAMMA_0 );
@@ -337,32 +332,31 @@ KAPPA_vec = TDataDFz.SL;
 FX_vec    = TDataDFz.FX;
 FZ_vec    = TDataDFz.FZ;
 
-zeros_vec = zeros(size(KAPPA_vec));
-ones_vec = ones(size(KAPPA_vec));
+zeros_vec = zeros(size(TDataDFz.SL));
 
-% Guess
-%FX0_guess = MF96_FX0_vec(KAPPA_vec, zeros_vec , zeros_vec, FZ_vec, tyre_coeffs);
-% SL_vec = min(KAPPA_vec):1e-4:max(KAPPA_vec);
-% tmp_zeros = zeros(size(SL_vec));
-% tmp_ones = ones(size(SL_vec));
-% 
-% FX0_fz_var_vec1 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
-% FX0_fz_var_vec2 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
-% FX0_fz_var_vec3 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
-% FX0_fz_var_vec4 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
-% 
-% % Check guess
-% figure('Name', 'Guess')
-% plot(TDataDFz.SL,TDataDFz.FX,'.', 'DisplayName', 'Raw')
-% hold on
-% plot(SL_vec,FX0_fz_var_vec1,'-', 'DisplayName', '$F_{z} = 220N$(guess)')
-% plot(SL_vec,FX0_fz_var_vec2,'-', 'DisplayName', '$F_{z} = 700N$(guess)')
-% plot(SL_vec,FX0_fz_var_vec3,'-', 'DisplayName', '$F_{z} = 900N$(guess)')
-% plot(SL_vec,FX0_fz_var_vec4,'-', 'DisplayName', '$F_{z} = 1120N$(guess)')
-% title('Pure longitudinal slip at different vertical loads (Guess)')
-% xlabel('$\kappa$ [-]')
-% ylabel('$F_{x0}$ [N]')
-% legend('Location','southeast')
+FX0_guess = MF96_FX0_vec(KAPPA_vec, zeros_vec , zeros_vec, FZ_vec, tyre_coeffs);
+
+SL_vec = min(KAPPA_vec):1e-4:max(KAPPA_vec);
+tmp_zeros = zeros(size(SL_vec));
+tmp_ones = ones(size(SL_vec));
+
+FX0_fz_var_vec1 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
+FX0_fz_var_vec2 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
+FX0_fz_var_vec3 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
+FX0_fz_var_vec4 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
+
+% Check guess
+figure('Name', 'Guess')
+plot(TDataDFz.SL,TDataDFz.FX,'.', 'DisplayName', 'Raw')
+hold on
+plot(SL_vec,FX0_fz_var_vec1,'-', 'DisplayName', '$F_{z} = 220N$(guess)')
+plot(SL_vec,FX0_fz_var_vec2,'-', 'DisplayName', '$F_{z} = 700N$(guess)')
+plot(SL_vec,FX0_fz_var_vec3,'-', 'DisplayName', '$F_{z} = 900N$(guess)')
+plot(SL_vec,FX0_fz_var_vec4,'-', 'DisplayName', '$F_{z} = 1120N$(guess)')
+title('Pure longitudinal slip at different vertical loads (Guess)')
+xlabel('$\kappa$ [-]')
+ylabel('$F_{x0}$ [N]')
+legend('Location','southeast')
 
 % Guess values for parameters to be optimised
 %    [pDx2 pEx2 pEx3 pHx2 pKx2 pKx3 pVx2]
@@ -387,28 +381,26 @@ tyre_coeffs.pKx3 = P_dfz(6) ;
 tyre_coeffs.pVx2 = P_dfz(7) ;
 
 
-FX0_fz_var_vec1 = MF96_FX0_vec(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_220.FZ)*ones_vec,tyre_coeffs);
-FX0_fz_var_vec2 = MF96_FX0_vec(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_700.FZ)*ones_vec,tyre_coeffs);
-FX0_fz_var_vec3 = MF96_FX0_vec(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_900.FZ)*ones_vec,tyre_coeffs);
-FX0_fz_var_vec4 = MF96_FX0_vec(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_1120.FZ)*ones_vec,tyre_coeffs);
+res_FX0_dfz_vec = resid_pure_Fx_varFz(P_dfz,FX_vec,KAPPA_vec,0 , FZ_vec,tyre_coeffs);
+
+FX0_fz_var_vec1 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
+FX0_fz_var_vec2 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
+FX0_fz_var_vec3 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
+FX0_fz_var_vec4 = MF96_FX0_vec(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
 
 
 figure('Name','Fx0(Fz)')
-plot(KAPPA_vec,FX_vec,'.','DisplayName','Raw')
+plot(TDataDFz.SL,TDataDFz.FX,'.','DisplayName','Raw')
 hold on
-plot(KAPPA_vec,FX0_fz_var_vec1,'-', 'LineWidth',2,'DisplayName','$F_{z} = 220N$')
-plot(KAPPA_vec,FX0_fz_var_vec2,'-', 'LineWidth',2,'DisplayName','$F_{z} = 700N$')
-plot(KAPPA_vec,FX0_fz_var_vec3,'-', 'LineWidth',2,'DisplayName','$F_{z} = 900N$')
-plot(KAPPA_vec,FX0_fz_var_vec4,'-', 'LineWidth',2,'DisplayName','$F_{z} = 1120N$')
+%plot(TDataSub.KAPPA,FX0_fz_nom_vec,'-')
+%plot(SL_vec,FX0_dfz_vec,'-','LineWidth',2)
+plot(SL_vec,FX0_fz_var_vec1,'-', 'LineWidth',2,'DisplayName','$F_{z} = 220N$')
+plot(SL_vec,FX0_fz_var_vec2,'-', 'LineWidth',2,'DisplayName','$F_{z} = 700N$')
+plot(SL_vec,FX0_fz_var_vec3,'-', 'LineWidth',2,'DisplayName','$F_{z} = 900N$')
+plot(SL_vec,FX0_fz_var_vec4,'-', 'LineWidth',2,'DisplayName','$F_{z} = 1120N$')
 title('Pure longitudinal slip at different vertical loads')
 ylabel('$F_{x0}$ [N]')
 legend('Location','southeast')
-
-res_FX0_dfz_vec = resid_pure_Fx_varFz(P_dfz,FX_vec,KAPPA_vec,0 , FZ_vec,tyre_coeffs);
-R2 = 1-res_Fx0_nom;
-RMSE = sqrt(res_Fx0_nom*sum(FX_vec.^2)/length(KAPPA_vec));
-fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
-err = [err ; R2 RMSE];
 
 %% Cornering Stiffness
 [kappa__x, Bx, Cx, Dx, Ex, SVx] =MF96_FX0_coeffs(0, 0, 0, mean(FZ_220.FZ), tyre_coeffs);
@@ -420,10 +412,10 @@ Calfa_vec3_0 = magic_formula_stiffness(kappa__x, Bx, Cx, Dx, Ex, SVx);
 [kappa__x, Bx, Cx, Dx, Ex, SVx] =MF96_FX0_coeffs(0, 0, 0, mean(FZ_1120.FZ), tyre_coeffs);
 Calfa_vec4_0 = magic_formula_stiffness(kappa__x, Bx, Cx, Dx, Ex, SVx);
 
-Calfa_vec1 = MF96_CorneringStiffness(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_220.FZ)*ones_vec,tyre_coeffs);
-Calfa_vec2 = MF96_CorneringStiffness(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_700.FZ)*ones_vec,tyre_coeffs);
-Calfa_vec3 = MF96_CorneringStiffness(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_900.FZ)*ones_vec,tyre_coeffs);
-Calfa_vec4 = MF96_CorneringStiffness(KAPPA_vec,zeros_vec ,zeros_vec, mean(FZ_1120.FZ)*ones_vec,tyre_coeffs);
+Calfa_vec1 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec2 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec3 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec4 = MF96_CorneringStiffness(SL_vec,tmp_zeros ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
 
 figure('Name','C_alpha')
 subplot(2,1,1)
@@ -438,10 +430,10 @@ legend({'$Fz_{220}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 subplot(2,1,2)
 hold on
 %plot(TDataSub.KAPPA,FX0_fz_nom_vec,'-')
-plot(KAPPA_vec,Calfa_vec1,'-','LineWidth',2)
-plot(KAPPA_vec,Calfa_vec2,'-','LineWidth',2)
-plot(KAPPA_vec,Calfa_vec3,'-','LineWidth',2)
-plot(KAPPA_vec,Calfa_vec4,'-','LineWidth',2)
+plot(SL_vec,Calfa_vec1,'-','LineWidth',2)
+plot(SL_vec,Calfa_vec2,'-','LineWidth',2)
+plot(SL_vec,Calfa_vec3,'-','LineWidth',2)
+plot(SL_vec,Calfa_vec4,'-','LineWidth',2)
 legend({'$Fz_{220}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 
 %% Fit coefficient with VARIABLE CAMBER
@@ -470,10 +462,11 @@ GAMMA_vec = TDataGamma.IA;
 FX_vec    = TDataGamma.FX;
 FZ_vec    = TDataGamma.FZ;
 
-% figure()
-% plot(KAPPA_vec,FX_vec);
-% xlabel('$\kappa$')
-% ylabel('$F_{x}$ [N]')
+figure()
+plot(KAPPA_vec,FX_vec);
+xlabel('$\kappa$')
+ylabel('$F_{x}$ [N]')
+
 
 % LSM_pure_Fx returns the residual, so minimize the residual varying X. It
 % is an unconstrained minimization problem
@@ -491,10 +484,10 @@ FX0_varGamma_vec4 = MF96_FX0_vec(KAPPA_vec, zeros_vec , GAMMA_4.IA, tyre_coeffs.
 figure('Name','Fx0(Gamma)')
 plot(KAPPA_vec,TDataGamma.FX,'.', 'DisplayName','Raw')
 hold on
-plot(KAPPA_vec,FX0_varGamma_vec0,'-', 'DisplayName', 'Fitted $\gamma_0$')
-plot(KAPPA_vec,FX0_varGamma_vec2,'-', 'DisplayName', 'Fitted $\gamma_2$')
-plot(KAPPA_vec,FX0_varGamma_vec4,'-', 'DisplayName', 'Fitted $\gamma_4$')
-title('Pure Longitudinal slip at verticle load $F_{z} = 220[N]$, $\alpha = 0$ ')
+plot(KAPPA_vec,FX0_varGamma_vec0,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\gamma = 0$')
+plot(KAPPA_vec,FX0_varGamma_vec2,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\gamma = 2$')
+plot(KAPPA_vec,FX0_varGamma_vec4,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\gamma = 4$')
+title('Pure Longitudinal slip at verticle load $F_{z}$ = 220[N], $\alpha = 0$ ')
 xlabel('$\kappa$ [-]')
 ylabel('$F_{x}$ [N]')
 legend('Location','southeast')
@@ -505,6 +498,7 @@ res_Fx0_varGamma  = resid_pure_Fx_varGamma(P_varGamma,FX_vec, KAPPA_vec,GAMMA_ve
 % R-squared is
 % 1-SSE/SST
 % SSE/SST = res_Fx0_nom
+
 % SSE is the sum of squared error,  SST is the sum of squared total
 fprintf('R-squared = %6.3f\n',1-res_Fx0_varGamma);
 
@@ -520,14 +514,14 @@ fprintf('R-squared = %6.3f\n',1-res_Fx0_varGamma);
 % fprintf('Kx      = %6.3f\n',Bx*Cx*Dx/tyre_coeffs.FZ0);
 
 % Longitudinal stiffness
-% Kx_vec = zeros(size(FZ_vec));
-% for i = 1:length(FZ_vec)
-%   [kappa__x, Bx, Cx, Dx, Ex, SVx] = MF96_FX0_coeffs(0, 0, 0, FZ_vec(i), tyre_coeffs);
-%   Kx_vec(i) = Bx*Cx*Dx/tyre_coeffs.FZ0;
+% Kx_vec = zeros(size(load_vec));
+% for i = 1:length(load_vec)
+%   [kappa__x, Bx, Cx, Dx, Ex, SVx] = MF96_FX0_coeffs(0, 0, 0, load_vec(i), tyre_coeffs);
+%   Kx_vec(i) = Bx*Cx*Dx/tyre_data.Fz0;
 % end
-% 
+%
 % figure('Name','Kx vs Fz')
-% plot(FZ_vec,Kx_vec,'o-')
+% plot(load_vec,Kx_vec,'o-')
 
 
 %% Combined Slip Longitudinal Force
@@ -536,24 +530,21 @@ fprintf('R-squared = %6.3f\n',1-res_Fx0_varGamma);
 [TDataComb, ~] = intersect_table_data(GAMMA_0, FZ_220);
 
 %Plotting raw data
-% figure('Name','Raw Data')
-% plot(TDataComb.SL,TDataComb.FX);
+figure('Name','Raw Data')
+plot(TDataComb.SL,TDataComb.FX);
 
 % Initialise values for parameters to be optimised
 %[rBx1, rBx2, rCx1, rHx1]
 P0 = [10, 5, 1, 0];
-lb = [];
-ub = [];
+lb = [1];
+ub = [10];
 
-KAPPA_vec = TDataComb.SL; % extract for clarity
+KAPPAComb_vec = TDataComb.SL; % extract for clarity
 ALPHA_vec = TDataComb.SA;
-FX_vec    = TDataComb.FX;
-zeros_vec = zeros(size(KAPPA_vec));
-ones_vec = ones(size(KAPPA_vec));
 
-fx0 =  MF96_FX0_vec(KAPPA_vec, zeros_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+FX_vec =  MF96_FX0_vec(KAPPAComb_vec, zeros(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
 
-[P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,fx0,FX_vec,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs),...
+[P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,FX_vec,TDataComb.FX,KAPPAComb_vec,ALPHA_vec,FZ0,tyre_coeffs),...
                                P0,[],[],[],[],lb,ub);
 
 % Change tyre data with new optimal values                             
@@ -562,29 +553,22 @@ tyre_coeffs.rBx2 = P_comb(2) ;
 tyre_coeffs.rCx1 = P_comb(3) ;
 tyre_coeffs.rHx1 = P_comb(4) ;
 
-fx_SA0_vec = MF96_FXcomb_vect(fx0, KAPPA_vec, mean(SA_0.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
-fx_SA3_vec = MF96_FXcomb_vect(fx0, KAPPA_vec, mean(SA_3neg.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
-fx_SA6_vec = MF96_FXcomb_vect(fx0, KAPPA_vec, mean(SA_6neg.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
+fx_SA0_vec = MF96_FXcomb_vect(FX_vec, KAPPAComb_vec, mean(SA_0.SA).*ones(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
+fx_SA3_vec = MF96_FXcomb_vect(FX_vec, KAPPAComb_vec, mean(SA_3neg.SA).*ones(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
+fx_SA6_vec = MF96_FXcomb_vect(FX_vec, KAPPAComb_vec, mean(SA_6neg.SA).*ones(size(KAPPAComb_vec)), zeros(size(KAPPAComb_vec)), FZ0.*ones(size(KAPPAComb_vec)), tyre_coeffs);
 
 
 figure, grid on, hold on;
-plot(KAPPA_vec*to_deg,TDataComb.FX,'.')
-plot(KAPPA_vec*to_deg,fx_SA0_vec,'r','LineWidth',1.5)
-plot(KAPPA_vec*to_deg,fx_SA3_vec,'g','LineWidth',1.5)
-plot(KAPPA_vec*to_deg,fx_SA6_vec,'b','LineWidth',1.5)
+plot(KAPPAComb_vec*to_deg,TDataComb.FX,'.')
+plot(KAPPAComb_vec*to_deg,fx_SA0_vec,'r','LineWidth',1.5)
+plot(KAPPAComb_vec*to_deg,fx_SA3_vec,'g','LineWidth',1.5)
+plot(KAPPAComb_vec*to_deg,fx_SA6_vec,'b','LineWidth',1.5)
 xlabel('long. slip $k(-)$')
 ylabel('$F_x(N)$')
 ylim('padded')
 legend('Raw Data','Fitted $\alpha$=0 deg',...
     'Fitted $\alpha$=-3 deg','Fitted $\alpha$=-6 deg',Location='southeast')
 title('Combined Slip Longitudinal Force')
-
-res_Fx_nom  = resid_comb_Fx(P_comb,fx0, FX_vec, KAPPA_vec, ALPHA_vec,FZ0, tyre_coeffs);
-R2 = 1-res_Fx_nom;
-RMSE = sqrt(res_Fx_nom*sum(FX_vec.^2)/length(KAPPA_vec));
-fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
-err = [err ; R2 RMSE];
-
 %% Plot Weights G Behaviour
 %
 % % Compute Gxa(k)
@@ -649,6 +633,7 @@ zeros_vec = zeros(size(ALPHA_vec));
 FZ0 = mean(FZ_vec);
 
 
+
 % Import Pure Slip lateral Force
 Fy0_vec = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, ...
                                FZ0.*ones_vec,tyre_coeffs);
@@ -695,6 +680,6 @@ title('Combined Slip Lateral Force')
 
 
 
-
 %% Save tyre data structure to mat file
 % save(['tyre_' data_set,'.mat'],'tyre_coeffs');
+
