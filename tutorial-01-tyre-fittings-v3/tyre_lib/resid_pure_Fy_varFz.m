@@ -5,17 +5,14 @@ function res = resid_pure_Fy_varFz(P,FY,ALPHA,GAMMA,FZ,tyre_data)
     %  with Fz varing, IA=0. Pacejka 1996 Magic Formula
     % ----------------------------------------------------------------------
 
-    % Define MF coefficients
-
-    %Fz0 = 200*4.44822; % Nominal load 200 lbf
-    
+    % Define MF coefficients    
     tmp_tyre_data = tyre_data;
     
-   
     tmp_tyre_data.pDy2 = P(1); 
     tmp_tyre_data.pEy2 = P(2);
-    tmp_tyre_data.pHy2 = P(3);
-    tmp_tyre_data.pVy2 = P(4);
+    tmp_tyre_data.pEy3 = P(3);
+    tmp_tyre_data.pHy2 = P(4);
+    tmp_tyre_data.pVy2 = P(5);
     
 
     % Longitudinal Force (Pure Longitudinal Slip) Equations

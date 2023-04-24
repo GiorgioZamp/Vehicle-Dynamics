@@ -277,30 +277,20 @@ TDataDFz = GAMMA_0; % since there's no long slip to intersect with
 % plot(TDataDFz.SA*to_deg,TDataDFz.FY,'.')
 
 % Initialise values for parameters to be optimised
-%    [pDy2,pEy2,pHy2,pVy2]
-% P0 = [ -0.1072,   0.2531,  2.1548e-05,   7.2616e-04]; 
-% lb = [ ];
-% ub = [ ];
-P0 = [-0.163509966342616,	-131.167452831061,	-0.000983362417156491,	-0.00912183395269232] ;
-lb = [-1e3,-1e3,-1e3,-1e3];
-ub = [ 1e2, 1e2, 1e2, 1e2];
+%    [pDy2,pEy2,pEy3,pHy2,pVy2] 
+lb = [];
+ub = [];
 
 ALPHA_vec = TDataDFz.SA;
 FY_vec    = TDataDFz.FY;
 FZ_vec    = TDataDFz.FZ;
-SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
+SA_vec = min(ALPHA_vec):0.0001:max(ALPHA_vec); % side slip vector [rad]
 
 % Optimize the coefficients
-[P_dfz,~,~] = fmincon(@(P)resid_pure_Fy_varFz(P,FY_vec,ALPHA_vec,0,FZ_vec,tyre_coeffs),...
-               P0,[],[],[],[],lb,ub);
 
-% GlobalSearch
-% ms = MultiStart('FunctionTolerance',2e-4,'UseParallel',true);
-% gs = GlobalSearch(ms);
-% ResParms = @(P)resid_pure_Fy_varFz(P,FY_vec,ALPHA_vec,0,FZ_vec,tyre_coeffs);
-% problem = createOptimProblem('fmincon','x0',[ -0.1072,   0.2531,  2.1548e-05,   7.2616e-04],...
-%     'objective',ResParms,'lb',[],'ub',[]);
-% P_dfz = run(gs,problem);
+P0 = [ 1,	-20.8823050751742, 1,	-0.00125628499167907,	0.00896921409574382]; 
+P_dfz = fmincon(@(P)resid_pure_Fy_varFz(P,FY_vec,ALPHA_vec,0,FZ_vec,tyre_coeffs),...
+               P0,[],[],[],[],lb,ub);
 
 % MultiStart
 % rng default % For reproducibility
@@ -309,17 +299,52 @@ SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 % ResParms = @(P)resid_pure_Fy_varFz(P,FY_vec,ALPHA_vec,0,FZ_vec,tyre_coeffs);
 % opts = optimoptions(@fmincon,'Algorithm','sqp');
 % problem = createOptimProblem('fmincon','objective',...
-%     ResParms,'x0',[-0.107, 0.253, 2e-05, 8e-04],'lb',[],'ub',[],'options',opts);
+%     ResParms,'x0',[-1, 0.1,0, -1, -1],'lb',[],'ub',[],'options',opts);%
 % P_dfz = run(ms,problem,50);
+
+% lsqcurvefit
+% tmp = intersect_table_data(FZ_220, GAMMA_0);
+% alpha0 = tmp.SA;
+% fy0 = tmp.FY;
+% fz0 = tmp.FZ;
+% fun = @(P,alpha) MF96_FY0_MOD(P,zeros(size(alpha0)), alpha, zeros(size(alpha0)), fz0, tyre_coeffs);
+% P_dfz(1,:) = lsqcurvefit(fun,P0,alpha0,fy0);
+% 
+% tmp = intersect_table_data(FZ_440, GAMMA_0);
+% alpha1 = tmp.SA;
+% fy1 = tmp.FY;
+% fz1 = tmp.FZ;
+% fun = @(P,alpha) MF96_FY0_MOD(P,zeros(size(alpha1)), alpha, zeros(size(alpha1)), fz1, tyre_coeffs);
+% P_dfz(2,:) = lsqcurvefit(fun,P0,alpha1,fy1);
+% 
+% tmp = intersect_table_data(FZ_700, GAMMA_0);
+% alpha2 = tmp.SA;
+% fy2 = tmp.FY;
+% fz2 = tmp.FZ;
+% fun = @(P,alpha) MF96_FY0_MOD(P,zeros(size(alpha2)), alpha, zeros(size(alpha2)), fz2, tyre_coeffs);
+% P_dfz(3,:) = lsqcurvefit(fun,P0,alpha2,fy2);
+% 
+% tmp = intersect_table_data(FZ_900, GAMMA_0);
+% alpha3 = tmp.SA;
+% fy3 = tmp.FY;
+% fz3 = tmp.FZ;
+% fun = @(P,alpha) MF96_FY0_MOD(P,zeros(size(alpha3)), alpha, zeros(size(alpha3)), fz3, tyre_coeffs);
+% P_dfz(4,:) = lsqcurvefit(fun,P0,alpha3,fy3);
+% 
+% tmp = intersect_table_data(FZ_1120, GAMMA_0);
+% alpha4 = tmp.SA;
+% fy4 = tmp.FY;
+% fz4 = tmp.FZ;
+% fun = @(P,alpha) MF96_FY0_MOD(P,zeros(size(alpha4)), alpha, zeros(size(alpha4)), fz4, tyre_coeffs);
+% P_dfz(5,:) = lsqcurvefit(fun,P0,alpha4,fy4);
 
 % Update tyre data with new optimal values (change them also in resid_pure
 % if you change the parameters
 tyre_coeffs.pDy2 = P_dfz(1);
 tyre_coeffs.pEy2 = P_dfz(2);
-tyre_coeffs.pHy2 = P_dfz(3);
-tyre_coeffs.pVy2 = P_dfz(4);
-
-
+tyre_coeffs.pEy3 = P_dfz(3);
+tyre_coeffs.pHy2 = P_dfz(4);
+tyre_coeffs.pVy2 = P_dfz(5);
 
 % Use Magic Formula to compute the fitting function 
 FY0_fz_var_vec1 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_220.FZ).*ones(size(SA_vec)),tyre_coeffs);
@@ -327,6 +352,12 @@ FY0_fz_var_vec2 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),
 FY0_fz_var_vec3 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_700.FZ).*ones(size(SA_vec)),tyre_coeffs);
 FY0_fz_var_vec4 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_900.FZ).*ones(size(SA_vec)),tyre_coeffs);
 FY0_fz_var_vec5 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_1120.FZ).*ones(size(SA_vec)),tyre_coeffs);
+
+% FY0_fz_var_vec1 = MF96_FY0_MOD(P_dfz(1,:),zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_220.FZ).*ones(size(SA_vec)),tyre_coeffs);
+% FY0_fz_var_vec2 = MF96_FY0_MOD(P_dfz(2,:),zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_440.FZ).*ones(size(SA_vec)),tyre_coeffs);
+% FY0_fz_var_vec3 = MF96_FY0_MOD(P_dfz(3,:),zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_700.FZ).*ones(size(SA_vec)),tyre_coeffs);
+% FY0_fz_var_vec4 = MF96_FY0_MOD(P_dfz(4,:),zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_900.FZ).*ones(size(SA_vec)),tyre_coeffs);
+% FY0_fz_var_vec5 = MF96_FY0_MOD(P_dfz(5,:),zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_1120.FZ).*ones(size(SA_vec)),tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
 figure('Name','Fy0 vs Fz'), hold on, grid on;
@@ -348,10 +379,10 @@ end
 legend(leg,Location="best")
 hold off
 
-res_Fy0_dfz  = resid_pure_Fy_varFz(P_dfz, FY_vec, ALPHA_vec, 0, FZ_vec, tyre_coeffs);
-R2 = 1-res_Fy0_dfz;
-RMSE = sqrt(res_Fy0_dfz*sum(FY_vec.^2)/length(ALPHA_vec));
-fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
+% res_Fy0_dfz  = resid_pure_Fy_varFz(P_dfz, FY_vec, ALPHA_vec, 0, FZ_vec, tyre_coeffs);
+% R2 = 1-res_Fy0_dfz;
+% RMSE = sqrt(res_Fy0_dfz*sum(FY_vec.^2)/length(ALPHA_vec));
+% fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 %err = [err ; R2 RMSE];
 
 %% Cornering Stiffness
@@ -467,6 +498,57 @@ R2 = 1-res_Fy0_gamm;
 RMSE = sqrt(res_Fy0_gamm*sum(FY_vec.^2)/length(ALPHA_vec));
 fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 %err = [err ; R2 RMSE];
+
+%%
+% [TDataComb, ~] = intersect_table_data(GAMMA_0, FZ_220);
+% 
+% FY_vec    = TDataComb.FY;
+% ALPHA_vec = TDataComb.SA;
+% KAPPA_vec = TDataComb.SL;
+% FZ_vec    = TDataComb.FZ;
+% ones_vec  = ones(size(ALPHA_vec));
+% zeros_vec = zeros(size(ALPHA_vec));
+% FZ0 = mean(FZ_vec);
+% 
+% 
+% % Fit Coefficients
+% %    [rBy1,rBy2,rBy3,rCy1,rHy1,rVy1,rVy4,rVy5,rVy6]
+% P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
+% lb = [];
+% ub = [];
+% 
+% 
+% [P_comb,~,~] = fmincon(@(P)resid_comb_Fy(P,FY_vec,zeros_vec,ALPHA_vec,FZ0,tyre_coeffs),...
+%                                P0,[],[],[],[],lb,ub);
+% 
+% tyre_coeffs.rBy1 = P_comb(1) ;
+% tyre_coeffs.rBy2 = P_comb(2) ;
+% tyre_coeffs.rBy3 = P_comb(3) ;
+% tyre_coeffs.rCy1 = P_comb(4) ;
+% tyre_coeffs.rHy1 = P_comb(5) ;
+% tyre_coeffs.rVy1 = P_comb(6) ;
+% tyre_coeffs.rVy4 = P_comb(7) ;
+% tyre_coeffs.rVy5 = P_comb(8) ;
+% tyre_coeffs.rVy6 = P_comb(9) ;
+% 
+% SA_vec = min(ALPHA_vec):1e-4:max(ALPHA_vec);
+% 
+% fy_vec = MF96_FYcomb_vect(KAPPA_vec, ALPHA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+% 
+% % Plot Raw and Fitted Data
+% figure, grid on, hold on;
+% % cc = jet(length(k));
+% % leg = cell(length(k)+1,1);
+% leg{1} = 'Raw Data';
+% plot(ALPHA_vec*to_deg,FY_vec,'b.')
+% % for i = 1:length(k)
+% %     [fy_vec] = MF96_FYcomb_vect(Fy0_vec, k(i), SA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+% %     leg{i+1} = ['k = ',num2str(k(i))];
+% % end
+% xlabel('$\alpha(°)$ ')
+% ylabel('$F_y(N)$')
+% legend(leg,Location='best')
+% title('Combined Slip Lateral Force')
 
 %% Fit Self Aligning Moment
 

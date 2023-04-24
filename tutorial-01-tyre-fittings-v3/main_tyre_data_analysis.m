@@ -33,7 +33,7 @@ data_set = 'Hoosier_B1464run30';  % braking/traction (pure log. force) + combine
 % tread width in inches
 diameter = 18*2.56;   % Converting inches to cm
 Fz0 = 220;            % [N] nominal load is given
-R0  = diameter/2/100; % [m] get from nominal load R0 (m) *** TO BE CHANGED ***
+R0  = diameter/2/100; % [m] get from nominal load R0 (m)
 
 
 fprintf('Loading dataset ...')
@@ -59,7 +59,7 @@ fprintf('completed!\n')
 %% Plot Raw Data
 
 figure
-tiledlayout(6,1)
+tiledlayout(7,1)
 
 ax_list(1) = nexttile; y_range = [min(min(-FZ),0) round(max(-FZ)*1.1)];
 plot(-FZ)
@@ -117,6 +117,15 @@ plot([cut_end cut_end],y_range,'--r')
 title('Tyre temperatures')
 xlabel('Samples [-]')
 ylabel('[degC]')
+
+ax_list(7) = nexttile;  y_range = [min(min(FX),0) round(max(FX)*1.1)];
+plot(FX,'DisplayName','Center')
+hold on
+plot([cut_start cut_start],y_range,'--r')
+plot([cut_end cut_end],y_range,'--r')
+title('Longitudinal Force')
+xlabel('Samples [-]')
+ylabel('[N]')
 
 linkaxes(ax_list,'x')
 
@@ -236,9 +245,9 @@ plot_selected_data(TData0);
 
 % FITTING
 % initialise tyre data
-% tyre_coeffs = initialise_tyre_data(R0, Fz0);
+tyre_coeffs = initialise_tyre_data(R0, Fz0);
 % Load coefficients from lateral test
-load('tyre_Hoosier_B1464run23.mat')
+% load('tyre_Hoosier_B1464run23.mat')
 
 % Fitting with Fz=Fz_nom= 220N and camber=0  alpha = 0 VX= 10
 % ------------------
@@ -621,8 +630,7 @@ title('Combined Slip Longitudinal Force')
 % hold off
 
 %% Combined Slip Lateral Force FY
-
-[TDataComb, ~] = intersect_table_data(GAMMA_0, FZ_220);
+[TDataComb, ~] = intersect_table_data(GAMMA_0, FZ_220, SA_3neg);
 
 FY_vec    = TDataComb.FY;
 ALPHA_vec = TDataComb.SA;
@@ -633,11 +641,6 @@ zeros_vec = zeros(size(ALPHA_vec));
 FZ0 = mean(FZ_vec);
 
 
-
-% Import Pure Slip lateral Force
-Fy0_vec = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, ...
-                               FZ0.*ones_vec,tyre_coeffs);
-
 % Fit Coefficients
 %    [rBy1,rBy2,rBy3,rCy1,rHy1,rVy1,rVy4,rVy5,rVy6]
 P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
@@ -645,7 +648,7 @@ lb = [];
 ub = [];
 
 
-[P_comb,~,~] = fmincon(@(P)resid_comb_Fy(P,Fy0_vec,FY_vec,zeros_vec,ALPHA_vec,FZ0,tyre_coeffs),...
+[P_comb,~,~] = fmincon(@(P)resid_comb_Fy(P,FY_vec,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs),...
                                P0,[],[],[],[],lb,ub);
 
 tyre_coeffs.rBy1 = P_comb(1) ;
@@ -658,27 +661,18 @@ tyre_coeffs.rVy4 = P_comb(7) ;
 tyre_coeffs.rVy5 = P_comb(8) ;
 tyre_coeffs.rVy6 = P_comb(9) ;
 
-
 SA_vec = min(ALPHA_vec):1e-4:max(ALPHA_vec);
-k = [-0.9, -0.5, -0.1, 0, 0.1, 0.5, 0.9];
+
+fy_vec = MF96_FYcomb_vect(KAPPA_vec, ALPHA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
 
 % Plot Raw and Fitted Data
 figure, grid on, hold on;
-cc = jet(length(k));
-leg = cell(length(k)+1,1);
-leg{1} = 'Raw Data';
 plot(ALPHA_vec*to_deg,FY_vec,'b.')
-for i = 1:length(k)
-    [fy_vec] = MF96_FYcomb_vect(Fy0_vec, k(i), SA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
-    leg{i+1} = ['k = ',num2str(k(i))];
-    plot(SA_vec*to_deg,fy_vec,'Color',cc(i,:),'LineWidth',1.5)
-end
+plot(ALPHA_vec,fy_vec);
 xlabel('$\alpha(°)$ ')
 ylabel('$F_y(N)$')
 legend(leg,Location='best')
 title('Combined Slip Lateral Force')
-
-
 
 %% Save tyre data structure to mat file
 % save(['tyre_' data_set,'.mat'],'tyre_coeffs');
