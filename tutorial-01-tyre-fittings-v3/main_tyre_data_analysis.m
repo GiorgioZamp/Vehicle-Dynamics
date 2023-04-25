@@ -23,8 +23,8 @@ to_deg = 180/pi;
 data_set_path = 'dataset/';
 
 % dataset selection and loading
-%data_set = 'Hoosier_B1464run23'; % pure lateral forces
-data_set = 'Hoosier_B1464run30';  % braking/traction (pure log. force) + combined
+data_set = 'Hoosier_B1464run23'; % pure lateral forces
+% data_set = 'Hoosier_B1464run30';  % braking/traction (pure log. force) + combined
 
 % tyre geometric data:
 % Hoosier	18.0x6.0-10
