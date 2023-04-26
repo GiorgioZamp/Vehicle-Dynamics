@@ -130,7 +130,7 @@ tyre_data = table(); % create empty table
 % Store raw data in the table
 tyre_data.SL =  SL(smpl_range);                    %Slip Ratio based on RE (Longi.)
 tyre_data.SA =  SA(smpl_range)*to_rad;             %Slip angle (Lateral)
-tyre_data.FZ = -FZ(smpl_range);  % 0.453592  lb/kg %Verticle Load
+tyre_data.FZ = -FZ(smpl_range);  % 0.453592  lb/kg %Vertical Load
 tyre_data.FX =  FX(smpl_range);                    %Longitudinal Force
 tyre_data.FY = -FY(smpl_range);                    %Lateral Force
 tyre_data.MZ =  MZ(smpl_range);                    %Self Aliging Moments
@@ -517,17 +517,16 @@ err = [err ; R2 RMSE];
 %% MZ_dFz - Self Aligning Moment with Variable Fz
 
 % [TDataMz_dFz, ~] = intersect_table_data(KAPPA_0 GAMMA_0);
-TDataMz_dFz = GAMMA_0;
-ALPHA_vec   = TDataMz_dFz.SA;
-FY_vec      = TDataMz_dFz.FY;
-FZ_vec      = TDataMz_dFz.FZ; 
-MZ_vec      = TDataMz_dFz.MZ;
+TDataTmp = GAMMA_0;
+ALPHA_vec   = TDataTmp.SA;
+FZ_vec      = TDataTmp.FZ; 
+MZ_vec      = TDataTmp.MZ;
 zeros_vec = zeros(size(ALPHA_vec));
 ones_vec = ones(size(ALPHA_vec));
 
 % Guess values for parameters to be optimised
 %    [qHz2, qBz2, qBz3, qDz2, qEz2, qEz3, qDz7]
-P0 = [-1, 1, -1, 1, -1, 1, -1] ;
+P0 = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1] ;
 lb = [];
 ub = [];
 
@@ -554,28 +553,23 @@ tyre_coeffs.qEz2  = P_Mz_varFz(5) ;
 tyre_coeffs.qEz3  = P_Mz_varFz(6) ;
 tyre_coeffs.qDz7  = P_Mz_varFz(7) ;
 
-%SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
+SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
-Fy = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_220.FZ)*ones_vec,tyre_coeffs);
-Mz0_220 = MF96_Mz0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_220.FZ)*ones_vec, Fy, tyre_coeffs);
-Fy = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_440.FZ)*ones_vec,tyre_coeffs);
-Mz0_440 = MF96_Mz0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_440.FZ)*ones_vec, Fy, tyre_coeffs);
-Fy = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_700.FZ)*ones_vec,tyre_coeffs);
-Mz0_700 = MF96_Mz0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_700.FZ)*ones_vec, Fy, tyre_coeffs);
-Fy = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_900.FZ)*ones_vec,tyre_coeffs);
-Mz0_900 = MF96_Mz0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_900.FZ)*ones_vec, Fy, tyre_coeffs);
-Fy = MF96_FY0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_1120.FZ)*ones_vec,tyre_coeffs);
-Mz0_1120 = MF96_Mz0_vec(zeros_vec, ALPHA_vec, zeros_vec, mean(FZ_1120.FZ)*ones_vec, Fy, tyre_coeffs);
+Mz0_220 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_220.FZ)*ones_vec, tyre_coeffs);
+Mz0_440 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_440.FZ)*ones_vec, tyre_coeffs);
+Mz0_700 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_700.FZ)*ones_vec, tyre_coeffs);
+Mz0_900 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_900.FZ)*ones_vec, tyre_coeffs);
+Mz0_1120 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_1120.FZ)*ones_vec, tyre_coeffs);
 
 
 % Plot Raw Data and Fitted Function
 figure('Name','Mz0(Fz)'), hold on;
 plot(ALPHA_vec*to_deg,MZ_vec,'.')
-plot(ALPHA_vec*to_deg,Mz0_220,'-','LineWidth',2)
-plot(ALPHA_vec*to_deg,Mz0_440,'-','LineWidth',2)
-plot(ALPHA_vec*to_deg,Mz0_700,'-','LineWidth',2)
-plot(ALPHA_vec*to_deg,Mz0_900,'-','LineWidth',2)
-plot(ALPHA_vec*to_deg,Mz0_1120,'-','LineWidth',2)
+plot(SA_vec*to_deg,Mz0_220,'-','LineWidth',2)
+plot(SA_vec*to_deg,Mz0_440,'-','LineWidth',2)
+plot(SA_vec*to_deg,Mz0_700,'-','LineWidth',2)
+plot(SA_vec*to_deg,Mz0_900,'-','LineWidth',2)
+plot(SA_vec*to_deg,Mz0_1120,'-','LineWidth',2)
 
 leg = cell(1,6);
 leg{1} = 'Raw Data';
@@ -598,13 +592,12 @@ err = [err ; R2 RMSE];
 % [TDataMz_tmp, ~] = intersect_table_data(KAPPA_0, FZ_220 );
 TDataTmp = FZ_220;
 ALPHA_vec   = TDataTmp.SA;
-FY_vec      = TDataTmp.FY;
 GAMMA_vec   = TDataTmp.IA;
 MZ_vec      = TDataTmp.MZ;
 FZ_vec      = TDataTmp.FZ;
 
 % Guess values for parameters to be optimised
-%  [qHz3, qHz4, qBz4, qBz5, qDz3, qDz4,qEz5, qDz8, qDz9]
+%    [qHz3, qHz4, qBz4, qBz5, qDz3, qDz4,qEz5, qDz8, qDz9]
 P0 = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 lb = [];
 ub = [];
@@ -627,23 +620,13 @@ tyre_coeffs.qDz9  = P_Mz_gamma(9) ;
 SA_vec = min(ALPHA_vec):1e-4:max(ALPHA_vec);
 zeros_vec = zeros(size(SA_vec));
 ones_vec = ones(size(SA_vec));
-FZ_vec = mean(TDataTmp.FZ)*ones_vec;
+FZ_vec = mean(FZ_vec)*ones_vec;
 
-Fy = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_0.IA)*ones_vec, FZ_vec,tyre_coeffs);
-Mz0_0 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_0.IA)*ones_vec, FZ_vec, Fy, tyre_coeffs);
-
-Fy = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_1.IA)*ones_vec, FZ_vec,tyre_coeffs);
-Mz0_1 = MF96_Mz0_vec(zeros_vec, SA_vec,mean(GAMMA_1.IA)*ones_vec, FZ_vec, Fy, tyre_coeffs);
-
-Fy = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_2.IA)*ones_vec, FZ_vec,tyre_coeffs);
-Mz0_2 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_2.IA)*ones_vec, FZ_vec, Fy, tyre_coeffs);
-
-Fy = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_3.IA)*ones_vec, FZ_vec,tyre_coeffs);
-Mz0_3 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_3.IA)*ones_vec, FZ_vec, Fy, tyre_coeffs);
-
-Fy = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_4.IA)*ones_vec, FZ_vec,tyre_coeffs);
-Mz0_4 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_4.IA)*ones_vec, FZ_vec, Fy, tyre_coeffs);
-
+Mz0_0 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_0.IA)*ones_vec, FZ_vec, tyre_coeffs);
+Mz0_1 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_1.IA)*ones_vec, FZ_vec, tyre_coeffs);
+Mz0_2 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_2.IA)*ones_vec, FZ_vec, tyre_coeffs);
+Mz0_3 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_3.IA)*ones_vec, FZ_vec, tyre_coeffs);
+Mz0_4 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_4.IA)*ones_vec, FZ_vec, tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
 figure('Name','Mz0(\gamma)'), hold on;

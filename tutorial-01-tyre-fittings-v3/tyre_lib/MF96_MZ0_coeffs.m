@@ -43,13 +43,14 @@ function [alpha__t, Bt, Ct, Dt, Et, Br, Dr, alpha__r] = MF96_MZ0_coeffs(kappa, a
   FZ01 = (LFZ0 * FZ0);
   dfz = Fz / FZ01 - 1;
   gamma__z = (phi * LGAMMAY);
+
   SHf = (SHy + SVy / Kya);
   SHt = qHz1 + qHz2 * dfz + (dfz * qHz4 + qHz3) * gamma__z;
   alpha__t = alpha + SHt;
   alpha__r = alpha + SHf;
-  Bt = (dfz ^ 2 * qBz3 + dfz * qBz2 + qBz1) * (1 + qBz4 * gamma__z + qBz5 * abs(gamma__z)) * LYK / LMUY;
+  Bt = (dfz ^ 2 * qBz3 + dfz * qBz2 + qBz1) * (1 + qBz4 * gamma__z.^2 + qBz5 * abs(gamma__z)) * LYK / LMUY;
   Ct = qCz1;
-  Dt = Fz * (dfz * qDz2 + qDz1) * (qDz4 * gamma__z ^ 2 + qDz3 * gamma__z + 1) * R0 / FZ0 * LT;
+  Dt = Fz * (dfz * qDz2 + qDz1) * (qDz4 * gamma__z ^ 2 + qDz3 * abs(gamma__z) + 1) * R0 / FZ01 * LT;
   Et = (dfz ^ 2 * qEz3 + dfz * qEz2 + qEz1) * (1 + (qEz5 * gamma__z + qEz4) * atan(Bt * Ct * alpha__t));
   Br = qBz9 * LYK / LMUY + qBz10 * By * Cy;
   Dr = Fz * (qDz6 + qDz7 * dfz + (dfz * qDz9 + qDz8) * gamma__z) * R0 * LMUY * LMR;

@@ -20,9 +20,7 @@ function res = resid_pure_Mz_gamma(P,MZ,ALPHA,GAMMA,FZ,tyre_data)
 
     res = 0;
     for i=1:length(ALPHA)
-       [alpha__y, By, Cy, Dy, Ey, ~, SVy, ~] = MF96_FY0_coeffs(0, ALPHA(i), GAMMA(i), FZ(i), tyre_data);
-       fy0_vec = magic_formula(alpha__y, By, Cy, Dy, Ey, SVy);
-       Mz0  = MF96_Mz0(fy0_vec, 0, ALPHA(i), GAMMA(i), FZ(i), tmp_tyre_data);
+       Mz0  = MF96_Mz0(0, ALPHA(i), GAMMA(i), FZ(i), tmp_tyre_data);
        res = res+(Mz0-MZ(i))^2;
     end
     
