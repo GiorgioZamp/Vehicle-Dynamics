@@ -41,7 +41,7 @@ R0  = diameter/2/100; % [m] get from nominal load R0 (m)
 fprintf('Loading dataset ...')
 switch data_set
     case 'Hoosier_B1464run23'
-        load ([data_set_path,data_set, '.mat']); % pure lateral
+       load ([data_set_path,data_set, '.mat']); % pure lateral
        cut_start = 32380;
        cut_end   = 54500;
     case 'Hoosier_B1464run30'
@@ -281,7 +281,7 @@ xlabel('$\alpha$ [deg]')
 ylabel('$F_{y0}$ [N]')
 legend('Raw','Fitted')
 title('Pure Slip Lateral Force')
-exportgraphics(f,'Graphs/PureLateral.png')
+exportgraphics(f,'Graphs/PureLateral.eps')
 
 res_Fy0_nom  = resid_pure_Fy(P_fz_nom, FY_vec, ALPHA_vec, 0, FZ0, tyre_coeffs);
 R2 = 1-res_Fy0_nom;
@@ -300,9 +300,9 @@ TDataTmp = GAMMA_0; % since there's no long slip to intersect with
 
 % Initialise values for parameters to be optimised
 %    [pDy2,pEy2,pHy2,pVy2]
-P0 = [ 0.4418, 0.01, -4.1231e-3, 1e3];
-lb = [-1000, 0, -1000, -1000];
-ub = [ 1000, 1,  1000,  1000];
+P0 = [ -0.274390567365254, -0.278086233494965, -0.00117998967899828, -0.0401680086940341];
+lb = [];
+ub = [];
 
 ALPHA_vec = TDataTmp.SA;
 FY_vec    = TDataTmp.FY;
@@ -327,7 +327,8 @@ FY0_fz_var_vec4 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),
 FY0_fz_var_vec5 = MF96_FY0_vec(zeros(size(SA_vec)), SA_vec, zeros(size(SA_vec)),mean(FZ_1120.FZ).*ones(size(SA_vec)),tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
-figure('Name','Fy0 vs Fz'), hold on, grid on;
+f = figure('Name','Fy0 vs Fz');
+hold on
 plot(TDataTmp.SA*to_deg,TDataTmp.FY,'.')
 plot(SA_vec*to_deg,FY0_fz_var_vec1,'-','LineWidth',2)
 plot(SA_vec*to_deg,FY0_fz_var_vec2,'-','LineWidth',2)
@@ -345,6 +346,7 @@ leg{i+1} = ['Fitted fz= ',num2str(tmp(i)),' N'];
 end
 legend(leg,Location="best")
 hold off
+exportgraphics(f,'Graphs/Fx0_dFz.eps')
 
 res_Fy0_dfz  = resid_pure_Fy_varFz(P_dfz, FY_vec, ALPHA_vec, 0, FZ_vec, tyre_coeffs);
 R2 = 1-res_Fy0_dfz;
@@ -368,12 +370,12 @@ tmp_zeros = zeros(size(SA_vec));
 tmp_ones = ones(size(SA_vec));
 
 Calfa_vec1 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_220.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec2 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec3 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
-Calfa_vec4 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec2 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_440.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec3 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_700.FZ)*tmp_ones,tyre_coeffs);
+Calfa_vec4 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_900.FZ)*tmp_ones,tyre_coeffs);
 Calfa_vec5 = MF96_CorneringStiffnessFY(tmp_zeros, SA_vec ,tmp_zeros, mean(FZ_1120.FZ)*tmp_ones,tyre_coeffs);
 
-figure('Name','C_alpha')
+f = figure('Name','C_alpha');
 subplot(2,1,1)
 hold on
 %plot(TDataSub.KAPPA,FX0_fz_nom_vec,'-')
@@ -384,7 +386,7 @@ plot(mean(FZ_900.FZ),Calfa_vec4_0,'+','LineWidth',2)
 plot(mean(FZ_1120.FZ),Calfa_vec5_0,'+','LineWidth',2)
 xlabel('$F_z (N)$')
 ylabel('$C_{\alpha} (N/rad)$')
-legend({'$Fz_{220}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
+legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 
 subplot(2,1,2)
 hold on
@@ -398,6 +400,7 @@ xlabel('$\alpha (rad)$')
 ylabel('$C_{\alpha} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 
+exportgraphics(f,'Graphs/C_alpha.eps')
 %% FY0_gamma - LATERAL FORCE with VARIABLE CAMBER
 % Zero longitudinal slip k and fixed normal load Fz
 
@@ -407,7 +410,7 @@ TDataTmp = FZ_220; % since SL is already zero everywhere
 
 % Initialise values for parameters to be optimised
 %    [pDy3,pEy3,pEy4,pHy3,pKy3,pVy3,pVy4]
-P0 = [ 1,   1,   1,   1,   1,   1,   1  ]; 
+P0 = [ 5.16349361588200,0.883205306970767,-4.20062483943437,-0.0313517996563904,1.34159743861844,-2.92370451981899,-2.81666715709586]; 
 lb = [];
 ub = [];
 
@@ -441,7 +444,7 @@ FY0_varGamma_vec4 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_3.IA).*ones_vec, 
 FY0_varGamma_vec5 = MF96_FY0_vec(zeros_vec, SA_vec, mean(GAMMA_4.IA).*ones_vec, FZ0*ones_vec,tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
-figure('Name','Fy0 vs Gamma')
+f = figure('Name','Fy0 vs Gamma');
 plot(ALPHA_vec*to_deg,TDataTmp.FY,'.')
 hold on
 plot(SA_vec*to_deg,FY0_varGamma_vec1,'-')
@@ -455,10 +458,11 @@ tmp = [0,1,2,3,4];
 leg = cell(length(tmp)+1,1);
 leg{1} = 'Raw Data';
 for i=1:length(tmp)
-leg{i+1} = ['Fitted gamma = ',num2str(tmp(i)),' [°]'];
+leg{i+1} = ['Fitted ','$\gamma$',' = ',num2str(tmp(i)),' [deg]'];
 end
 legend(leg,Location="best")
 hold off
+exportgraphics(f,'Graphs/Fx0_gamma.eps')
 
 res_Fy0_gamm  = resid_pure_Fy_varGamma(P_varGamma, FY_vec, ALPHA_vec,GAMMA_vec, FZ0, tyre_coeffs);
 R2 = 1-res_Fy0_gamm;
@@ -478,7 +482,7 @@ FZ0 = mean(TDataTmp.FZ);
 
 % Guess values for parameters to be optimised
 %    [qBz1,qBz9,qBz10,qCz1,qDz1,qDz6,qEz1,qEz4,qHz1]
-P0 = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1  ];
+P0 = [7.35347522395674,0,0,1.67097884314219,0.197223329858040,0.00307532725022005,0.515207229031359,0.164755141111871,-0.0106709285011952];
 lb = [  ];
 ub = [  ];
 
@@ -503,13 +507,14 @@ Mz0_fit = MF96_Mz0_vec(zeros(size(SA_vec)), SA_vec,zeros(size(SA_vec)), FZ0*ones
 
 
 % Plot Raw Data and Fitted Function
-figure('Name','Mz0(Fz0)')
+f = figure('Name','Mz0(Fz0)');
 plot(ALPHA_vec*to_deg,MZ_vec,'.')
 hold on
 plot(SA_vec*to_deg,Mz0_fit,'-','LineWidth',2)
 xlabel('$\alpha$ [deg]')
 ylabel('$M_{z0}$ [Nm]')
 legend('Raw','Fitted')
+exportgraphics(f,'Graphs/Mz0.eps')
 
 res_Mz0  = resid_pure_Mz(P,MZ_vec,ALPHA_vec,0,FZ0,tyre_coeffs);
 R2 = 1-res_Mz0;
@@ -529,7 +534,7 @@ ones_vec = ones(size(ALPHA_vec));
 
 % Guess values for parameters to be optimised
 %    [qHz2, qBz2, qBz3, qDz2, qEz2, qEz3, qDz7]
-P0 = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1] ;
+P0 = [-0.00767395160043653,-4.71595003290210,-6.17019496981862,-0.0549111816154103,-1.69617162475273,-3.39063846665826,0.0171847774709159];
 lb = [];
 ub = [];
 
@@ -566,7 +571,8 @@ Mz0_1120 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_1120.FZ)*ones_vec,
 
 
 % Plot Raw Data and Fitted Function
-figure('Name','Mz0(Fz)'), hold on;
+f = figure('Name','Mz0(Fz)');
+hold on;
 plot(ALPHA_vec*to_deg,MZ_vec,'.')
 plot(SA_vec*to_deg,Mz0_220,'-','LineWidth',2)
 plot(SA_vec*to_deg,Mz0_440,'-','LineWidth',2)
@@ -583,6 +589,7 @@ end
 xlabel('$\alpha$ [deg]')
 ylabel('$M_{z0}$ [Nm]')
 legend(leg,Location='Best')
+exportgraphics(f,'Graphs/Mz0_dFz.eps')
 
 res_Mz0  = resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros_vec, FZ_vec, tyre_coeffs);
 R2 = 1-res_Mz0;
@@ -601,7 +608,7 @@ FZ_vec      = TDataTmp.FZ;
 
 % Guess values for parameters to be optimised
 %    [qHz3, qHz4, qBz4, qBz5, qDz3, qDz4,qEz5, qDz8, qDz9]
-P0 = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+P0 = [0.720767969228803,0.0934620620316319,-0.281057344706274,-0.281558360232466,-3.31843325657878,42.5363302221465,-9.68793770573582,-1.82587609907207,-0.796929452914326];
 lb = [];
 ub = [];
 
@@ -632,7 +639,8 @@ Mz0_3 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_3.IA)*ones_vec, FZ_vec, tyre_
 Mz0_4 = MF96_Mz0_vec(zeros_vec, SA_vec, mean(GAMMA_4.IA)*ones_vec, FZ_vec, tyre_coeffs);
 
 % Plot Raw Data and Fitted Function
-figure('Name','Mz0(\gamma)'), hold on;
+f = figure('Name','Mz0(\gamma)');
+hold on
 plot(ALPHA_vec*to_deg,MZ_vec,'.')
 plot(SA_vec*to_deg,Mz0_0,'-','LineWidth',2)
 plot(SA_vec*to_deg,Mz0_1,'-','LineWidth',2)
@@ -644,11 +652,12 @@ leg = cell(1,6);
 leg{1} = 'Raw Data';
 tmp = [0,1,2,4,5];
 for i = 1:5
-    leg{i+1} = ['Fitted \gamma= ',num2str(tmp(i)),' °'];
+    leg{i+1} = ['Fitted ','$\gamma$',' = ',num2str(tmp(i)),' deg'];
 end
 xlabel('$\gamma$ [deg]')
 ylabel('$M_{z0}$ [Nm]')
 legend(leg,Location='Best')
+exportgraphics(f,'Graphs/Mz0_gamma.eps')
 
 res_Mz0  = resid_pure_Mz_gamma(P, MZ_vec, ALPHA_vec, GAMMA_vec, FZ_vec, tyre_coeffs);
 R2 = 1-res_Mz0;
@@ -1025,6 +1034,7 @@ plot(SL_vec,FX0_fz_var_vec2,'-', 'LineWidth',2,'DisplayName','$F_{z} = 700N$')
 plot(SL_vec,FX0_fz_var_vec3,'-', 'LineWidth',2,'DisplayName','$F_{z} = 900N$')
 plot(SL_vec,FX0_fz_var_vec4,'-', 'LineWidth',2,'DisplayName','$F_{z} = 1120N$')
 title('Pure longitudinal slip at different vertical loads')
+xlabel('$k$ [-]')
 ylabel('$F_{x0}$ [N]')
 legend('Location','southeast')
 exportgraphics(f,'Graphs/Fx0dFz.eps')
@@ -1077,14 +1087,10 @@ ones_vec  = ones(size(TDataTmp.SL));
 
 % Guess values for parameters to be optimised
 %  [pDx3]
-P0 = 0;
+P0 = 10.8761875333065;
 
 % NOTE: many local minima => limits on parameters are fundamentals
 % Limits for parameters to be optimised {lb: lower_bound, up: upper_bound}
-% 1< pCx1 < 2
-% 0< pEx1 < 1
-%lb = [0, 0,  0, 0,  0,  0,  0];
-%ub = [2, 1e6,1, 1,1e1,1e2,1e2];
 lb = [];
 ub = [];
 
@@ -1164,8 +1170,8 @@ plot(TDataTmp.SL,TDataTmp.FX);
 % Initialise values for parameters to be optimised
 %[rBx1, rBx2, rCx1, rHx1]
 P0 = [10, 5, 1, 0];
-lb = 1;
-ub = 10;
+lb = [];
+ub = [];
 
 KAPPA_vec = TDataTmp.SL; % extract for clarity
 ALPHA_vec = TDataTmp.SA;
@@ -1219,56 +1225,6 @@ xlabel('k')
 ylabel('Gxa')
 legend('$\alpha$ = 0°','$\alpha$ = -3°','$\alpha$ = -6°','Location','best')
 title('Gxa(k)')
-%% Plot Weights G Behaviour
-%
-% % Compute Gxa(k)
-% sa = [0,3,6,10,20]; % side slip in radians
-% sl = linspace(-1,1,1e4);   % longitudinal slip
-%
-% Gxa_k = zeros(length(sa),length(sl));
-% for i = 1:length(sa)
-%     for j = 1:length(sl)
-%         Gxa_k(i,j) = MF96_FXFYCOMB_coeffs(sl(j), sa(i)*to_rad, 0, FZ0, tyre_coeffs); %alpha row, k column
-%     end
-% end
-%
-% % Plot Gxa(k)
-% figure, grid on, hold on;
-% plot(sl,Gxa_k)
-% xlabel('longitudinal slip $k$(-)')
-% ylabel('$G_{xa}(-)$')
-% ylim('padded')
-% leg = cell(size(sa));
-% for i = 1:length(sa)
-%     leg{i} = ['$\alpha$ = ',num2str(sa(i)),' deg'];
-% end
-% legend(leg,Location="best")
-% title('Weighting function $G_{xa}$ as a function of $k$')
-% hold off
-%
-% % Compute Gxa(alpha)
-% sa = linspace(-20,20,1e4);
-% sl = [0,0.1,0.2,0.5,0.8,1];
-% Gxa_a = zeros(length(sl),length(sa));
-% for i = 1:length(sl)
-%     for j = 1:length(sa)
-%         Gxa_a(i,j) = MF96_FXFYCOMB_coeffs(sl(i), sa(j), 0, FZ0, tyre_coeffs); % k row, alpha column
-%     end
-% end
-%
-% % Plot Gxa(alpha)
-% figure, grid on, hold on;
-% plot(sa,Gxa_a)
-% xlabel('side slip angle $\alpha$(deg)')
-% ylabel('$G_{xa}(-)$')
-% ylim('padded')
-% leg = cell(size(sl));
-% for i = 1:length(sl)
-%     leg{i} = ['$k$ = ',num2str(sl(i))];
-% end
-% legend(leg,Location="best")
-% title('Weighting function $G_{xa}$ as a function of $\alpha$')
-% hold off
 
 %% FY - Combined Slip Lateral Force 
 [TDataTmp, ~] = intersect_table_data(GAMMA_0, FZ_220);
@@ -1307,6 +1263,7 @@ fy_vec6 = MF96_FYcomb_vect(SL_vec, mean(SA_6neg.SA).*ones_vec, zeros_vec, FZ0.*o
 
 % Plot Raw and Fitted Data
 f = figure;
+set(groot,'defaulttextinterpreter','latex') 
 hold on
 plot(KAPPA_vec,FY_vec,'b.')
 plot(SL_vec,fy_vec0,'r','LineWidth',1.5);
@@ -1314,7 +1271,7 @@ plot(SL_vec,fy_vec3,'g','LineWidth',1.5);
 plot(SL_vec,fy_vec6,'c','LineWidth',1.5);
 xlabel('$k(-)$ ')
 ylabel('$F_y(N)$')
-legend('Raw Data','alpha = 0°','alpha = -3°','alpha = -6°',Location='best')
+legend('Raw Data',['$\alpha$',' = ',num2str(0)],['$\alpha$',' = ',num2str(3)],['$\alpha$',' = ',num2str(6)],Location='best');
 title('Combined Slip Lateral Force')
 %exportgraphics(f,'Graphs/Fy_com.eps');
 

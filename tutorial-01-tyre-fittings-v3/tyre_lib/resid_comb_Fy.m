@@ -22,7 +22,7 @@ function res = resid_comb_Fy(P,FY,KAPPA,ALPHA,FZ,tyre_data)
 
     % Lateral Force (Combined Slip) Equations
     res = 0;
-    for i=1:length(ALPHA)
+    for i=1:length(KAPPA)
        fy  = MF96_FYcomb(KAPPA(i), ALPHA(i), 0, FZ, tmp_tyre_data);
        res = res+(fy-FY(i))^2;
     end
