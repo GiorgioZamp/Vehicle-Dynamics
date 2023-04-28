@@ -30,9 +30,6 @@ function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y, Kya] = MF96_FY0_coeffs(kapp
   LKA             = tyre_data.LKA;
   LMUY            = tyre_data.LMUY;
   LVY             = tyre_data.LVY;
-  
-  %Fz01            = tyre_data.Fz01;
-
 
 
  % main code

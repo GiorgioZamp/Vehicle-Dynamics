@@ -397,16 +397,16 @@ TDataTmp = intersect_table_data(FZ_220,P_80);
 
 % Initialise values for parameters to be optimised
 %    [pDy3,pEy3,pEy4,pHy3,pKy3,pVy3,pVy4]
-P0 = [0,0,0,-0.05,0.2,-1,-1]; 
-lb = [];
-ub = [];
+P0 = [ 5.16349361588200,0.883205306970767,-4.20062483943437,-0.0313517996563904,1.34159743861844,-2.92370451981899,-2.81666715709586]; 
+lb = [-1,-10,-1,-1,-1,-1,-1];
+ub = [10,1,1,1,10,1,1];
 
 % Cut messy parts
 % cut = [104:840,990:1725,1873:2609,2761:3495,3645:4380];
 
-ALPHA_vec = TDataTmp.SA; % extract for clarity
-GAMMA_vec = TDataTmp.IA;
-FY_vec    = TDataTmp.FY;
+ALPHA_vec = TDataTmp.SA(cut); % extract for clarity
+GAMMA_vec = TDataTmp.IA(cut);
+FY_vec    = TDataTmp.FY(cut);
 FZ0 = mean(TDataTmp.FZ);
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
