@@ -136,7 +136,7 @@ tyre_data.SA =  SA(smpl_range)*to_rad;             %Slip angle (Lateral)
 tyre_data.FZ = -FZ(smpl_range);  % 0.453592  lb/kg %Vertical Load
 tyre_data.FX =  FX(smpl_range);                    %Longitudinal Force
 tyre_data.FY = -FY(smpl_range);                    %Lateral Force
-tyre_data.MZ =  MZ(smpl_range);                    %Self Aliging Moments
+tyre_data.MZ = -MZ(smpl_range);                    %Self Aliging Moments
 tyre_data.IA =  IA(smpl_range)*to_rad;             %Inclination Angle (Camber)
 tyre_data.P  =  P(smpl_range);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -471,7 +471,8 @@ FZ0       = mean(TDataTmp.FZ(cut));
 
 % Guess values for parameters to be optimised
 %    [qBz1,qBz9,qBz10,qCz1,qDz1,qDz6,qEz1,qEz4,qHz1]
-P0 = [1, 0,-11,16,0.2,15,0.515207229031359,0.164755141111871,-0.0106709285011952];
+% P0 = [1, 0,-11,16,0.2,15,0.515207229031359,0.164755141111871,-0.0106709285011952];
+P0 = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1];
 lb = [0,-1,-15,14,  0,14,-200,0,-1];
 ub = [1, 0,-10,20,  1,18,0,1,0];
 
@@ -514,7 +515,7 @@ err = [err ; R2 RMSE];
 
 %% MZ_dFz - Self Aligning Moment with Variable Fz      !!!NEED FIXING!!!
 
-TDataTmp    = GAMMA_0;
+TDataTmp    = intersect_table_data(GAMMA_0,P_80);
 cut = [70:837, 978:1722, 1820:2607, 2757:3492, 3586:4377];
 ALPHA_vec   = TDataTmp.SA(cut);
 FZ_vec      = TDataTmp.FZ(cut); 
@@ -525,8 +526,8 @@ ones_vec = ones(size(ALPHA_vec));
 % Guess values for parameters to be optimised
 %    [qHz2, qBz2, qBz3, qDz2, qEz2, qEz3, qDz7]
 P0 = [1,1,1,1,1,1,1];
-lb = [-1,-1,-1,-1,-10,-1,-10];
-ub = [1,10,10,1,10,10,1];
+lb = [];
+ub = [];
 
 % Optimize the coefficients 
 [P_Mz_varFz,~,~] = fmincon(@(P)resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros_vec, FZ_vec, tyre_coeffs),...
@@ -552,6 +553,8 @@ tyre_coeffs.qEz3  = P_Mz_varFz(6) ;
 tyre_coeffs.qDz7  = P_Mz_varFz(7) ;
 
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
+zeros_vec = zeros(size(SA_vec));
+ones_vec = ones(size(SA_vec));
 
 Mz0_220 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_220.FZ)*ones_vec, tyre_coeffs);
 Mz0_440 = MF96_Mz0_vec(zeros_vec, SA_vec, zeros_vec, mean(FZ_440.FZ)*ones_vec, tyre_coeffs);
@@ -581,7 +584,7 @@ ylabel('$M_{z0}$ [Nm]')
 legend(leg,Location='Best')
 exportgraphics(f,'Graphs/Mz0_dFz.eps')
 
-res_Mz0  = resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros_vec, FZ_vec, tyre_coeffs);
+res_Mz0  = resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros(size(ALPHA_vec)), FZ_vec, tyre_coeffs);
 R2 = 1-res_Mz0;
 RMSE = sqrt(res_Mz0*sum(MZ_vec.^2)/length(ALPHA_vec));
 fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
@@ -1202,9 +1205,9 @@ legend('Raw Data','Fitted $\alpha$=0 ',...
 title('Combined Slip Longitudinal Force')
 exportgraphics(f,'Graphs/Fx_Comb.eps')
 
-res_Fx  = resid_comb_Fx(P,FX_vec,TDataTmp.FX,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs);
+res_Fx  = resid_comb_Fx(P_comb,FX0_vec,TDataTmp.FX,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs);
 R2 = 1-res_Fx;
-RMSE = sqrt(res_Fx*sum(FX_vec.^2)/length(KAPPA_vec));
+RMSE = sqrt(res_Fx*sum(FX0_vec.^2)/length(KAPPA_vec));
 fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [err ; R2 RMSE];
 
@@ -1291,6 +1294,9 @@ title('Gyk(k)')
 
 %% Save tyre data structure to mat file
 save(['tyre_' tyre_name,'.mat'],'tyre_coeffs');
+TTT = rows2vars(struct2table(tyre_coeffs));
+delete ttt.xls
+writetable(TTT,'ttt.xls')
 
 %% Extras
 
