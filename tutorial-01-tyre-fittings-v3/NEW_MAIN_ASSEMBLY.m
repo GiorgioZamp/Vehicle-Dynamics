@@ -1299,7 +1299,7 @@ delete ttt.xls
 writetable(TTT,'ttt.xls')
 
 %% Extras
-
+% sweep k and use alpha steps
 % for i=1:length(SA_vec)
 %     for j=1:length(SL_vec)
 % fx_vec = MF96_FXcomb_vect(FX0_vec, KAPPA_vec, mean(SA_0.SA).*ones(size(KAPPA_vec)),    zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);

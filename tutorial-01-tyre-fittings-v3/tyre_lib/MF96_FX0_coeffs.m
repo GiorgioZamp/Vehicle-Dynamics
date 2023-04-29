@@ -33,15 +33,18 @@ function [kappa__x, Bx, Cx, Dx, Ex, SVx] = MF96_FX0_coeffs(kappa, alpha, phi, Fz
 
   FZ01 = (LFZ0 * FZ0);
   dfz = Fz / FZ01 - 1;
+
   SHx = (dfz * pHx2 + pHx1) * LHX;
   SVx = Fz * (dfz * pVx2 + pVx1) * LVX * LMUX;
+
   gamma__s = (phi * LGAMMAY);
   kappa__x = kappa + SHx;
+
   Cx = pCx1 * LCX;
-  mu__x = (dfz * pDx2 + pDx1) * (-pDx3 * gamma__s ^ 2 + 1) * LMUX;
+  mu__x = (dfz * pDx2 + pDx1) * (1 - pDx3 * gamma__s ^ 2) * LMUX;
   Dx = mu__x * Fz;
   Kxk = Fz * (dfz * pKx2 + pKx1) * exp(-(pKx3 * dfz)) * LKXK;
   Ex = (dfz ^ 2 * pEx3 + dfz * pEx2 + pEx1) * (1 - pEx4 * Sign(kappa__x)) * LEX;
-  Bx = Kxk / Cx / Dx;
+  Bx = Kxk / (Cx * Dx);
   
  end
