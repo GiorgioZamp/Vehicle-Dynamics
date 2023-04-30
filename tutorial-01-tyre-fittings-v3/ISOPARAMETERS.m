@@ -135,8 +135,8 @@ tyre_data.SL =  SL(smpl_range);                    %Slip Ratio based on RE (Long
 tyre_data.SA =  SA(smpl_range)*to_rad;             %Slip angle (Lateral)
 tyre_data.FZ = -FZ(smpl_range);  % 0.453592  lb/kg %Vertical Load
 tyre_data.FX =  FX(smpl_range);                    %Longitudinal Force
-tyre_data.FY = -FY(smpl_range);                    %Lateral Force
-tyre_data.MZ = -MZ(smpl_range);                    %Self Aliging Moments
+tyre_data.FY =  FY(smpl_range);                    %Lateral Force
+tyre_data.MZ =  MZ(smpl_range);                    %Self Aliging Moments
 tyre_data.IA =  IA(smpl_range)*to_rad;             %Inclination Angle (Camber)
 tyre_data.P  =  P(smpl_range);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,7 +215,7 @@ ylabel('[N]')
 %  Nominal Load Fz==Fz0=220 N, Zero Camber, Longitudinal Slip k=0, p=80 psi
 
 % initialise tyre data
-tyre_coeffs = initialise_tyre_data(R0, Fz0);
+tyre_coeffs = initialise_tyre_dataTMP(R0, Fz0);
 
 % Intersect tables to obtain specific sub-datasets
  % Extract data for zero slip and camber, and Nominal Load Fz0
@@ -232,8 +232,7 @@ FZ0 = mean(TDataTmp.FZ);
 
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣, 𝗉𝖤𝗒𝟣, 𝗉𝖧𝗒𝟣, 𝗉𝖪𝗒𝟣, 𝗉𝖪𝗒𝟤, 𝗉𝖵𝗒1] 
-% P0 = [1.54027309068454,2.43404156744141,0.346228681636638,-0.00489082598162627,-29.6801903969105,-1.01712562049631,0.0476749940408608];
-P0 =   [0.7,3.1,-0.4,0,-110,-3.2,0]; % Good for ISO
+P0 = [1.54,  2.43,  0.346,  -0.0048,   -29.68,   -1.017,    0.047   ]; % Good for ISO
 lb = [];
 ub = [];
 
@@ -1299,7 +1298,7 @@ delete ttt.xls
 writetable(TTT,'ttt.xls')
 
 %% Extras
-
+% sweep k and use alpha steps
 % for i=1:length(SA_vec)
 %     for j=1:length(SL_vec)
 % fx_vec = MF96_FXcomb_vect(FX0_vec, KAPPA_vec, mean(SA_0.SA).*ones(size(KAPPA_vec)),    zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
