@@ -264,7 +264,7 @@ xlabel('$\alpha$ [deg]')
 ylabel('$F_{y0}$ [N]')
 legend('Raw','Fitted')
 title('Pure Slip Lateral Force')
-exportgraphics(f,'GraphsISO/Fy0.eps')
+exportgraphics(f,'Graphs/Fy0.eps')
 
 res_Fy0_nom  = resid_pure_Fy(P_fz_nom, FY_vec, ALPHA_vec, 0, FZ0, tyre_coeffs);
 R2 = 1-res_Fy0_nom;
@@ -284,10 +284,9 @@ TDataTmp = intersect_table_data(GAMMA_0, P_80);
 
 % Initialise values for parameters to be optimised
 %    [pDy2,pEy2,pHy2,pVy2]
-P0 = [-0.1 0.028647980921706 -1.079496308172234e-04 1.236517768833923e-06];
-lb = [-1 -1 -1 -1];
-ub = [ 1 1 1 1];
-
+P0 = [-0.05, 0.03, -1e-04, 8e-03];
+lb = [];
+ub = [];
 
 ALPHA_vec = TDataTmp.SA;
 FY_vec    = TDataTmp.FY;
@@ -331,7 +330,7 @@ leg{i+1} = ['Fitted fz= ',num2str(tmp(i)),' N'];
 end
 legend(leg,Location="best")
 hold off
-exportgraphics(f,'GraphsISO/Fy0_dFz.eps')
+exportgraphics(f,'Graphs/Fy0_dFz.eps')
 
 res_Fy0_dfz  = resid_pure_Fy_varFz(P_dfz, FY_vec, ALPHA_vec, 0, FZ_vec, tyre_coeffs);
 R2 = 1-res_Fy0_dfz;
@@ -385,7 +384,7 @@ xlabel('$\alpha (rad)$')
 ylabel('$C_{\alpha} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 
-exportgraphics(f,'GraphsISO/C_alpha.eps')
+exportgraphics(f,'Graphs/C_alpha.eps')
 %% FY0_gamma - LATERAL FORCE with VARIABLE CAMBER
 % Zero longitudinal slip k and fixed normal load Fz
 
@@ -449,7 +448,7 @@ leg{i+1} = ['Fitted ','$\gamma$',' = ',num2str(tmp(i)),' [deg]'];
 end
 legend(leg,Location="best")
 hold off
-exportgraphics(f,'GraphsISO/Fy0_gamma.eps')
+exportgraphics(f,'Graphs/Fy0_gamma.eps')
 
 res_Fy0_gamm  = resid_pure_Fy_varGamma(P_varGamma, FY_vec, ALPHA_vec, GAMMA_vec, FZ0, tyre_coeffs);
 R2 = 1-res_Fy0_gamm;
@@ -459,7 +458,7 @@ err = [err ; R2 RMSE];
 
 %% MZ - PURE SLIP SELF ALIGNING MOMENT
 
-[TDataTmp, ~] = intersect_table_data( GAMMA_0, FZ_220 );
+[TDataTmp, ~] = intersect_table_data( GAMMA_0, FZ_440 );
 
 cut = 104:840;
 ALPHA_vec = TDataTmp.SA(cut);
@@ -501,7 +500,7 @@ plot(ALPHA_vec*to_deg,Mz0_fit,'-','LineWidth',2)
 xlabel('$\alpha$ [deg]')
 ylabel('$M_{z0}$ [Nm]')
 legend('Raw','Fitted')
-exportgraphics(f,'GraphsISO/Mz0.eps')
+exportgraphics(f,'Graphs/Mz0.eps')
 
 res_Mz0  = resid_pure_Mz(P,MZ_vec,ALPHA_vec,0,FZ0,tyre_coeffs);
 R2 = 1-res_Mz0;
