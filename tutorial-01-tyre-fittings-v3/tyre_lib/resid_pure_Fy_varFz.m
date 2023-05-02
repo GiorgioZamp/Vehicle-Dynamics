@@ -23,5 +23,4 @@ function res = resid_pure_Fy_varFz(P,FY,ALPHA,GAMMA,FZ,tyre_data)
     
     % Compute the residuals
     res = res/sum(FY.^2);
-
 end

@@ -232,9 +232,13 @@ FZ0 = mean(TDataTmp.FZ);
 
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣,  𝗉𝖤𝗒𝟣,    𝗉𝖧𝗒𝟣,      𝗉𝖪𝗒𝟣,     𝗉𝖪𝗒𝟤,    𝗉𝖵𝗒1] 
-P0 = [1.35,  1,     0,       0,        -21,       2,        0];
-lb = [1,     0,    -1,      -1,       -inf,    -inf,     -inf];
-ub = [2,     3,     1,       1,        inf,     inf,      inf];
+P0 = [1.35,  1,     0,       0,        -21,       2,        0]; %220
+% lb = [1,     0,    -1,      -1,       -inf,    -inf,     -inf];
+% ub = [2,     3,     1,       1,        inf,     inf,      inf];
+% P0 =   [0.7,3.1,-0.4,0,-110,-3.2,0];
+% P0 = [1 1 1 1 1 1 1]; %900/1120
+lb = [];
+ub = [];
 
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
@@ -273,7 +277,7 @@ fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [];
 err = [err ; R2 RMSE];
 
-%% FY0_dfz - LATERAL FORCE WITH VARIABLE LOAD FZ 
+%% FY0_dfz - LATERAL FORCE WITH VARIABLE LOAD FZ [FIX]
 
 % Extract data with variable load
 TDataTmp = intersect_table_data(GAMMA_0, P_80);
@@ -284,10 +288,9 @@ TDataTmp = intersect_table_data(GAMMA_0, P_80);
 
 % Initialise values for parameters to be optimised
 %    [pDy2,pEy2,pHy2,pVy2]
-P0 = [-0.1 0.028647980921706 -1.079496308172234e-04 1.236517768833923e-06];
-lb = [-1 -1 -1 -1];
-ub = [ 1 1 1 1];
-
+P0 = [-0.01 -0.01 0.01 0.01];
+lb = [];
+ub = [];
 
 ALPHA_vec = TDataTmp.SA;
 FY_vec    = TDataTmp.FY;
@@ -517,13 +520,13 @@ ALPHA_vec   = TDataTmp.SA(cut);
 FZ_vec      = TDataTmp.FZ(cut); 
 MZ_vec      = TDataTmp.MZ(cut);
 zeros_vec = zeros(size(ALPHA_vec));
-ones_vec = ones(size(ALPHA_vec));
+% ones_vec = ones(size(ALPHA_vec));
 
 % Guess values for parameters to be optimised
 %    [qHz2, qBz2, qBz3, qDz2, qEz2, qEz3, qDz7]
-P0 = [1,1,1,1,1,1,1];
-lb = [];
-ub = [];
+P0 = [0 0 0 0 0 0 0];
+lb = [-1 -1 -1 -1 -1 -1 -2];
+ub = [1 1 1 1 1 1 1];
 
 % Optimize the coefficients 
 [P_Mz_varFz,~,~] = fmincon(@(P)resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros_vec, FZ_vec, tyre_coeffs),...
@@ -578,7 +581,7 @@ end
 xlabel('$\alpha$ [deg]')
 ylabel('$M_{z0}$ [Nm]')
 legend(leg,Location='Best')
-exportgraphics(f,'Graphs/Mz0_dFz.eps')
+exportgraphics(f,'GraphsISO/Mz0_dFz.eps')
 
 res_Mz0  = resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros(size(ALPHA_vec)), FZ_vec, tyre_coeffs);
 R2 = 1-res_Mz0;
@@ -647,7 +650,7 @@ end
 xlabel('$\alpha$ [deg]')
 ylabel('$M_{z0}$ [Nm]')
 legend(leg,Location='Best')
-exportgraphics(f,'Graphs/Mz0_gamma.eps')
+exportgraphics(f,'GraphsISO/Mz0_gamma.eps')
 
 res_Mz0  = resid_pure_Mz_gamma(P, MZ_vec, ALPHA_vec, GAMMA_vec, FZ_vec, tyre_coeffs);
 R2 = 1-res_Mz0;
