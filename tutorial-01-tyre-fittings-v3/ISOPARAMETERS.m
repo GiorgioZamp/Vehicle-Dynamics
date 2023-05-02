@@ -939,7 +939,7 @@ ylabel('$F_{x0}$ [N]')
 xlim([-0.25, 0.21]);
 ylim([-850, 800]);
 legend('Location','southeast')
-exportgraphics(f,'Graphs/Fx0pure.eps')
+exportgraphics(f,'GraphsISO/Fx0pure.eps')
 
 res_Fx0  = resid_pure_Fx(P,FX_vec, KAPPA_vec,0,FZ0, tyre_coeffs);
 R2 = 1-res_Fx0;
@@ -1024,7 +1024,7 @@ title('Pure longitudinal slip at different vertical loads')
 xlabel('$k$ [-]')
 ylabel('$F_{x0}$ [N]')
 legend('Location','southeast')
-exportgraphics(f,'Graphs/Fx0dFz.eps')
+exportgraphics(f,'GraphsISO/Fx0dFz.eps')
 
 R2 = 1-res_FX0_dfz_vec;
 RMSE = sqrt(res_FX0_dfz_vec*sum(FX_vec.^2)/length(KAPPA_vec));
@@ -1067,7 +1067,7 @@ plot(SL_vec,Calfa_vec4,'-','LineWidth',2)
 xlabel('$k (rad)$')
 ylabel('$C_{k} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
-exportgraphics(f,'Graphs/C_kappa.eps')
+exportgraphics(f,'GraphsISO/C_kappa.eps')
 
 %% FX0_gamma - LONGITUDINAL FORCE with VARIABLE CAMBER
 % Extract data with no slip and nominal load
@@ -1120,7 +1120,7 @@ plot(KAPPA_vec,FX0_varGamma_vec4,'-', 'LineWidth',1, 'DisplayName',  'Fitted $\g
 xlabel('$\kappa$ [-]')
 ylabel('$F_{x0}$ [N]')
 legend('Location','southeast')
-exportgraphics(f,'Graphs/Fx0_gamma.eps')
+exportgraphics(f,'GraphsISO/Fx0_gamma.eps')
 
 % Calculate the residuals with the optimal solution found above
 res_Fx0_varGamma  = resid_pure_Fx_varGamma(P_varGamma,FX_vec, KAPPA_vec,GAMMA_vec,tyre_coeffs.FZ0, tyre_coeffs);
@@ -1169,9 +1169,7 @@ KAPPA_vec = TDataTmp.SL; % extract for clarity
 ALPHA_vec = TDataTmp.SA;
 FZ0 = mean(TDataTmp.FZ);
 
-FX0_vec =  MF96_FX0_vec(KAPPA_vec, zeros(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
-
-[P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,FX0_vec,TDataTmp.FX,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs),...
+[P_comb,~,~] = fmincon(@(P)resid_comb_Fx(P,TDataTmp.FX,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs),...
                                P0,[],[],[],[],lb,ub);
 
 % Change tyre data with new optimal values                             
@@ -1180,9 +1178,9 @@ tyre_coeffs.rBx2 = P_comb(2) ;
 tyre_coeffs.rCx1 = P_comb(3) ;
 tyre_coeffs.rHx1 = P_comb(4) ;
 
-fx_SA0_vec = MF96_FXcomb_vect(FX0_vec, KAPPA_vec, mean(SA_0.SA).*ones(size(KAPPA_vec)),    zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
-fx_SA3_vec = MF96_FXcomb_vect(FX0_vec, KAPPA_vec, mean(SA_3neg.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
-fx_SA6_vec = MF96_FXcomb_vect(FX0_vec, KAPPA_vec, mean(SA_6neg.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
+fx_SA0_vec = MF96_FXcomb_vect(KAPPA_vec, mean(SA_0.SA).*ones(size(KAPPA_vec)),    zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
+fx_SA3_vec = MF96_FXcomb_vect(KAPPA_vec, mean(SA_3neg.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
+fx_SA6_vec = MF96_FXcomb_vect(KAPPA_vec, mean(SA_6neg.SA).*ones(size(KAPPA_vec)), zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
 
 
 f = figure('Name','Fx(k)');
@@ -1197,22 +1195,25 @@ ylim('padded')
 legend('Raw Data','Fitted $\alpha$=0 ',...
     'Fitted $\alpha$=-3 deg','Fitted $\alpha$=-6 deg',Location='southeast')
 title('Combined Slip Longitudinal Force')
-exportgraphics(f,'Graphs/Fx_Comb.eps')
+exportgraphics(f,'GraphsISO/Fx_Comb.eps')
 
-res_Fx  = resid_comb_Fx(P_comb,FX0_vec,TDataTmp.FX,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs);
+% Error
+res_Fx  = resid_comb_Fx(P_comb,TDataTmp.FX,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs);
 R2 = 1-res_Fx;
-RMSE = sqrt(res_Fx*sum(FX0_vec.^2)/length(KAPPA_vec));
+RMSE = sqrt(res_Fx*sum(TDataTmp.FX.^2)/length(KAPPA_vec));
 fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [err ; R2 RMSE];
 
+% Weights
 Gxa = zeros(length(KAPPA_vec),3);
-for i=1:length(KAPPA_vec)
-    [Gxa(i,1),~,~] = MF96_FXFYCOMB_coeffs(KAPPA_vec(i), mean(SA_0.SA),    0, FZ0, tyre_coeffs);
-    [Gxa(i,2),~,~] = MF96_FXFYCOMB_coeffs(KAPPA_vec(i), mean(SA_3neg.SA), 0, FZ0, tyre_coeffs);
-    [Gxa(i,3),~,~] = MF96_FXFYCOMB_coeffs(KAPPA_vec(i), mean(SA_6neg.SA), 0, FZ0, tyre_coeffs);
+SL_vec = min(KAPPA_vec):1e-4:max(KAPPA_vec);
+for i=1:length(SL_vec)
+    [Gxa(i,1),~,~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_0.SA),    0, FZ0, tyre_coeffs);
+    [Gxa(i,2),~,~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_3neg.SA), 0, FZ0, tyre_coeffs);
+    [Gxa(i,3),~,~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_6neg.SA), 0, FZ0, tyre_coeffs);
 end
 figure('Name','Gxa(k)')
-plot(KAPPA_vec,Gxa)
+plot(SL_vec,Gxa)
 xlabel('k')
 ylabel('Gxa')
 legend(['$\alpha$',' = ',num2str(0),' deg'],['$\alpha$',' = ',num2str(3),...
@@ -1229,8 +1230,8 @@ FZ0 = mean(FZ_220.FZ);
 
 % Fit Coefficients
 %    [rBy1,rBy2,rBy3,rCy1,rHy1,rVy1,rVy4,rVy5,rVy6]
-% P0 = [10,5,0.001,1,0.01,0.01,50,1,20];
-P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
+P0 = [4.9,2.2,0.001,1,0.01,0.01,50,1,20];
+% P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
 lb = [];
 ub = [];
 
@@ -1267,7 +1268,7 @@ xlabel('$k(-)$ ')
 ylabel('$F_y(N)$')
 legend('Raw Data',['$\alpha$',' = ',num2str(0)],['$\alpha$',' = ',num2str(3)],['$\alpha$',' = ',num2str(6)],Location='best');
 title('Combined Slip Lateral Force')
-exportgraphics(f,'Graphs/Fy_comb.eps');
+exportgraphics(f,'GraphsISO/Fy_comb.eps');
 
 res_Fy  = resid_comb_Fy(P,FY_vec,KAPPA_vec,ALPHA_vec,FZ0,tyre_coeffs);
 R2 = 1-res_Fy;
@@ -1298,14 +1299,24 @@ writetable(TTT,'t_err.xls')
 
 %% Extras
 % sweep k and use alpha steps
-% for i=1:length(SA_vec)
-%     for j=1:length(SL_vec)
-% fx_vec = MF96_FXcomb_vect(FX0_vec, KAPPA_vec, mean(SA_0.SA).*ones(size(KAPPA_vec)),    zeros(size(KAPPA_vec)), FZ0.*ones(size(KAPPA_vec)), tyre_coeffs);
-% fy_vec = MF96_FYcomb_vect(SL_vec, mean(SA_0.SA).*ones_vec,    zeros_vec, FZ0.*ones_vec, tyre_coeffs);
-%     end
-% end
+SL_vec = -15*to_rad:0.001:15*to_rad;
+SA_vec = (-6:1:6)*to_rad;
+ones_vec = ones(size(SL_vec));
+zeros_vec = zeros(size(SL_vec));
+FZ0 = 220;
 
+fx_vec = zeroes(length(SL_vec),length(SA_vec));
+fy_vec = zeroes(length(SL_vec),length(SA_vec));
 
+for i=1:length(SA_vec)
+    for j=1:length(SL_vec)
+        fx_vec(:,i) = MF96_FXcomb_vect(SL_vec, SA_vec(j).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+        fy_vec(:,i) = MF96_FYcomb_vect(SL_vec, SA_vec(j).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+    end
+end
+
+% figure('Name','Friction Ellipse')
+% plot(fy_vec,fx_vec)
 
 
 
