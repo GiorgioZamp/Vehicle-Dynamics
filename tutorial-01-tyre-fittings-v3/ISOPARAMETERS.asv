@@ -219,7 +219,7 @@ tyre_coeffs = initialise_tyre_dataTMP(R0, Fz0);
 
 % Intersect tables to obtain specific sub-datasets
  % Extract data for zero slip and camber, and Nominal Load Fz0
-[TDataTmp, ~] = intersect_table_data( GAMMA_0, FZ_900 );
+[TDataTmp, ~] = intersect_table_data( GAMMA_0, FZ_220 );
 
 ALPHA_vec = TDataTmp.SA; % extract for clarity
 FY_vec    = TDataTmp.FY;
@@ -232,12 +232,10 @@ FZ0 = mean(TDataTmp.FZ);
 
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣,  𝗉𝖤𝗒𝟣,    𝗉𝖧𝗒𝟣,      𝗉𝖪𝗒𝟣,     𝗉𝖪𝗒𝟤,    𝗉𝖵𝗒1] 
-% P0 = [1.35,  1,     0,       0,        -21,       2,        0]; %220
-% lb = [1,     0,    -1,      -1,       -inf,    -inf,     -inf];
-% ub = [2,     3,     1,       1,        inf,     inf,      inf];
- P0 = [1,  1,    -1,       -1,        -1,       1,        0];
+P0 = [1.12541180337932	2.71903809386550	0.443814145673160	-0.00380219704257947	-110.004170170015	3.08313490429168	0.0792154945741895];
 lb = [];
-u
+ub = [];
+
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
 % Optimize the coefficients
@@ -275,7 +273,7 @@ fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [];
 err = [err ; R2 RMSE];
 
-%% FY0_dfz - LATERAL FORCE WITH VARIABLE LOAD FZ [MMH]
+%% FY0_dfz - LATERAL FORCE WITH VARIABLE LOAD FZ [FIX]
 
 % Extract data with variable load
 TDataTmp = intersect_table_data(GAMMA_0, P_80);
@@ -286,8 +284,7 @@ TDataTmp = intersect_table_data(GAMMA_0, P_80);
 
 % Initialise values for parameters to be optimised
 %    [pDy2,pEy2,pHy2,pVy2]
-% P0 = [-0.274390567365254 -0.278086233494965 -0.00117998967899828 -0.0401680086940341];
-P0 = [-0.1, 0.25, 2e-05, 8e-04] ;
+P0 = [0 0 0 0];
 lb = [];
 ub = [];
 
@@ -588,7 +585,7 @@ RMSE = sqrt(res_Mz0*sum(MZ_vec.^2)/length(ALPHA_vec));
 fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [err ; R2 RMSE];
 
-%% MZ_gamma - Self Aligning Moment with Variable Camber   !!!NEED FIXING!!!
+%% MZ_gamma - Self Aligning Moment with Variable Camber 
 
 % [TDataMz_tmp, ~] = intersect_table_data(KAPPA_0, FZ_220 );
 TDataTmp = FZ_220;

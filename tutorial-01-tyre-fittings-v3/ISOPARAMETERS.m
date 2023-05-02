@@ -585,7 +585,7 @@ RMSE = sqrt(res_Mz0*sum(MZ_vec.^2)/length(ALPHA_vec));
 fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [err ; R2 RMSE];
 
-%% MZ_gamma - Self Aligning Moment with Variable Camber   !!!NEED FIXING!!!
+%% MZ_gamma - Self Aligning Moment with Variable Camber 
 
 % [TDataMz_tmp, ~] = intersect_table_data(KAPPA_0, FZ_220 );
 TDataTmp = FZ_220;
@@ -657,7 +657,6 @@ err = [err ; R2 RMSE];
 %% LOAD COMBINED DATASET-------------------------------------------------------------
 disp('Switchig to Braking/Traction dataset')
 clearvars -except tyre_coeffs err
-pause(0.25)
 %---------------------------------------------------------------------------------------
 %% Select tyre dataset: -> BRAKING/TRACTION + COMBINED SLIP
 
@@ -1151,7 +1150,7 @@ err = [err ; R2 RMSE];
 % figure('Name','Kx vs Fz')
 % plot(load_vec,Kx_vec,'o-')
 
-%% FX - Combined Slip Longitudinal Force
+%% FX - Combined Slip Longitudinal Force !!FIX WEIGHTS!!
 % Fz=220N, variable alpha, p=12psi, gamma=0
 % Fit Longitudal Force with Combined Slip for VARIABLE slip angle ALPHA
 [TDataTmp, ~] = intersect_table_data(GAMMA_0, FZ_220);
@@ -1230,6 +1229,7 @@ FZ0 = mean(FZ_220.FZ);
 
 % Fit Coefficients
 %    [rBy1,rBy2,rBy3,rCy1,rHy1,rVy1,rVy4,rVy5,rVy6]
+% P0 = [10,5,0.001,1,0.01,0.01,50,1,20];
 P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
 lb = [];
 ub = [];
@@ -1292,6 +1292,9 @@ save(['tyre_' tyre_name,'.mat'],'tyre_coeffs');
 TTT = rows2vars(struct2table(tyre_coeffs));
 delete ttt.xls
 writetable(TTT,'ttt.xls')
+T_err = table(err(:,1),err(:,2),'VariableNames',["R2","RMSE"]);
+delete t_err.xls
+writetable(TTT,'t_err.xls')
 
 %% Extras
 % sweep k and use alpha steps
