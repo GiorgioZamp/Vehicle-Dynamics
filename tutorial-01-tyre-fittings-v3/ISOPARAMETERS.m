@@ -233,12 +233,12 @@ FZ0 = mean(TDataTmp.FZ);
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣,  𝗉𝖤𝗒𝟣,    𝗉𝖧𝗒𝟣,      𝗉𝖪𝗒𝟣,     𝗉𝖪𝗒𝟤,    𝗉𝖵𝗒1] 
 % P0 = [1.12541180337932	2.71903809386550	0.443814145673160	-0.00380219704257947	-110.004170170015	3.08313490429168	0.0792154945741895];
-% P0 = [1.55  2.6168 0.4213 0    -132.2724 4.9992 0.5];
-P0 = [1.3  2.6168  0      0    -132.2724 4.9992 0.5];
-lb = [1,    -inf, -inf, -inf, -inf, 1.5, -inf]; 
-ub = [+inf, +inf, 1,    +inf, +inf, 3,   +inf];
-% lb = [];
-% ub = [];
+P0 = [1.55  2.6 0.42 0    -132 5 0.5];
+% P0 = [1.3  2.6168  0      0    -132.2724 4.9992 0.5];
+% lb = [1,    -inf, -inf, -inf, -inf, 1.5, -inf]; 
+% ub = [+inf, +inf, 1,    +inf, +inf, 3,   +inf];
+lb = [];
+ub = [];
 
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
@@ -289,8 +289,8 @@ TDataTmp = intersect_table_data(GAMMA_0, P_80);
 % Initialise values for parameters to be optimised
 %    [pDy2,pEy2,pHy2,pVy2]
 P0 = [0 0 0 0];
-lb = [];
-ub = [];
+lb = [-0.008 0.07 -1 0.007];%lb = [-0.008 0.07 -1 0.007];rmse:66.661
+ub = [ 1 1 1 1];
 
 ALPHA_vec = TDataTmp.SA;
 FY_vec    = TDataTmp.FY;
@@ -367,11 +367,11 @@ f = figure('Name','C_alpha');
 subplot(2,1,1)
 hold on
 %plot(TDataSub.KAPPA,FX0_fz_nom_vec,'-')
-plot(mean(FZ_220.FZ),Calfa_vec1_0,'+','LineWidth',2)
-plot(mean(FZ_440.FZ),Calfa_vec2_0,'+','LineWidth',2)
-plot(mean(FZ_700.FZ),Calfa_vec3_0,'+','LineWidth',2)
-plot(mean(FZ_900.FZ),Calfa_vec4_0,'+','LineWidth',2)
-plot(mean(FZ_1120.FZ),Calfa_vec5_0,'+','LineWidth',2)
+plot(mean(FZ_220.FZ),-Calfa_vec1_0,'+','LineWidth',2)
+plot(mean(FZ_440.FZ),-Calfa_vec2_0,'+','LineWidth',2)
+plot(mean(FZ_700.FZ),-Calfa_vec3_0,'+','LineWidth',2)
+plot(mean(FZ_900.FZ),-Calfa_vec4_0,'+','LineWidth',2)
+plot(mean(FZ_1120.FZ),-Calfa_vec5_0,'+','LineWidth',2)
 xlabel('$F_z (N)$')
 ylabel('$C_{\alpha} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
@@ -379,11 +379,11 @@ legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
 subplot(2,1,2)
 hold on
 %plot(TDataSub.KAPPA,FX0_fz_nom_vec,'-')
-plot(SA_vec,Calfa_vec1,'-','LineWidth',2)
-plot(SA_vec,Calfa_vec2,'-','LineWidth',2)
-plot(SA_vec,Calfa_vec3,'-','LineWidth',2)
-plot(SA_vec,Calfa_vec4,'-','LineWidth',2)
-plot(SA_vec,Calfa_vec5,'-','LineWidth',2)
+plot(SA_vec,-Calfa_vec1,'-','LineWidth',2)
+plot(SA_vec,-Calfa_vec2,'-','LineWidth',2)
+plot(SA_vec,-Calfa_vec3,'-','LineWidth',2)
+plot(SA_vec,-Calfa_vec4,'-','LineWidth',2)
+plot(SA_vec,-Calfa_vec5,'-','LineWidth',2)
 xlabel('$\alpha (rad)$')
 ylabel('$C_{\alpha} (N/rad)$')
 legend({'$Fz_{220}$','$Fz_{440}$','$Fz_{700}$','$Fz_{900}$','$Fz_{1120}$'})
