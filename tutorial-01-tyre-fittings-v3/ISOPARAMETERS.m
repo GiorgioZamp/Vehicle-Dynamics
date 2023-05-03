@@ -232,9 +232,13 @@ FZ0 = mean(TDataTmp.FZ);
 
 % Guess values for parameters to be optimised
 %    [𝗉𝖢𝗒𝟣, 𝗉𝖣𝗒𝟣,  𝗉𝖤𝗒𝟣,    𝗉𝖧𝗒𝟣,      𝗉𝖪𝗒𝟣,     𝗉𝖪𝗒𝟤,    𝗉𝖵𝗒1] 
-P0 = [1.12541180337932	2.71903809386550	0.443814145673160	-0.00380219704257947	-110.004170170015	3.08313490429168	0.0792154945741895];
-lb = [];
-ub = [];
+% P0 = [1.12541180337932	2.71903809386550	0.443814145673160	-0.00380219704257947	-110.004170170015	3.08313490429168	0.0792154945741895];
+% P0 = [1.55  2.6168 0.4213 0    -132.2724 4.9992 0.5];
+P0 = [1.3  2.6168  0      0    -132.2724 4.9992 0.5];
+lb = [1,    -inf, -inf, -inf, -inf, 1.5, -inf]; 
+ub = [+inf, +inf, 1,    +inf, +inf, 3,   +inf];
+% lb = [];
+% ub = [];
 
 SA_vec = min(ALPHA_vec):0.001:max(ALPHA_vec); % side slip vector [rad]
 
@@ -273,7 +277,7 @@ fprintf('R^2 = %6.3f \nRMSE = %6.3f \n', R2, RMSE );
 err = [];
 err = [err ; R2 RMSE];
 
-%% FY0_dfz - LATERAL FORCE WITH VARIABLE LOAD FZ [FIX]
+%% FY0_dfz - LATERAL FORCE WITH VARIABLE LOAD FZ
 
 % Extract data with variable load
 TDataTmp = intersect_table_data(GAMMA_0, P_80);
@@ -516,27 +520,21 @@ ALPHA_vec   = TDataTmp.SA(cut);
 FZ_vec      = TDataTmp.FZ(cut); 
 MZ_vec      = TDataTmp.MZ(cut);
 zeros_vec = zeros(size(ALPHA_vec));
-% ones_vec = ones(size(ALPHA_vec));
+% cut bad parts
+idx = ALPHA_vec>-12*to_rad & ALPHA_vec<12*to_rad;
+MZ_vec    = MZ_vec(idx,:);
+ALPHA_vec = ALPHA_vec(idx,:);
+FZ_vec    = FZ_vec(idx,:);
 
 % Guess values for parameters to be optimised
 %    [qHz2, qBz2, qBz3, qDz2, qEz2, qEz3, qDz7]
 P0 = [0 0 0 0 0 0 0];
-lb = [-1 -1 -1 -1 -1 -1 -2];
+lb = [-1 -1 -1 -1 -1 -1 -4];
 ub = [1 1 1 1 1 1 1];
 
 % Optimize the coefficients 
 [P_Mz_varFz,~,~] = fmincon(@(P)resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros_vec, FZ_vec, tyre_coeffs),...
                                P0,[],[],[],[],lb,ub);
-
-% MultiStart (to find right P0-> then switch to fmincon)
-% rng default % For reproducibility
-% gs = GlobalSearch('FunctionTolerance',2e-4,'NumTrialPoints',2000);
-% ms = MultiStart(gs,'UseParallel',true);
-% Repsarms = @(P)resid_pure_Mz_varFz(P, MZ_vec, ALPHA_vec, zeros_vec, FZ_vec, tyre_coeffs);
-% opts = optimoptions(@fmincon,'Algorithm','sqp');
-% problem = createOptimProblem('fmincon','objective',...
-%     Repsarms,'x0',P0,'lb',lb,'ub',ub,'options',opts);
-% P_Mz_varFz = run(ms,problem,50);
 
 % Update tyre data with new optimal values                             
 tyre_coeffs.qHz2  = P_Mz_varFz(1) ;
@@ -774,7 +772,7 @@ tyre_data.SL =  SL(smpl_range);                    % Slip Ratio based on RE (Lon
 tyre_data.SA =  SA(smpl_range)*to_rad;             % Slip angle (Lateral)
 tyre_data.FZ = -FZ(smpl_range);  % 0.453592  lb/kg % Vertical Load (- to get to ISO)
 tyre_data.FX =  FX(smpl_range);                    % Longitudinal Force
-tyre_data.FY = -FY(smpl_range);                    % Lateral Force (- to get to ISO)
+tyre_data.FY =  FY(smpl_range);                    % Lateral Force (- to get to ISO)
 tyre_data.MZ =  MZ(smpl_range);                    % Self Aliging Moment
 tyre_data.IA =  IA(smpl_range)*to_rad;             % Inclination Angle (Camber)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1161,7 +1159,7 @@ plot(TDataTmp.SL,TDataTmp.FX);
 
 % Initialise values for parameters to be optimised
 %[rBx1, rBx2, rCx1, rHx1]
-P0 = [300, 200, 1, 0];
+P0 = [8.3, 5, 1, 0];
 lb = [];
 ub = [];
 
@@ -1230,8 +1228,8 @@ FZ0 = mean(FZ_220.FZ);
 
 % Fit Coefficients
 %    [rBy1,rBy2,rBy3,rCy1,rHy1,rVy1,rVy4,rVy5,rVy6]
-P0 = [4.9,2.2,0.001,1,0.01,0.01,50,1,20];
-% P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2];
+P0 = [4.9,2.2,0,1,0.01,0.01,50,1,20];
+% P0 = [2,3,0.002,2,0.04,-0.2,1,-0.2,-0.2]; %same
 lb = [];
 ub = [];
 
@@ -1295,7 +1293,7 @@ delete ttt.xls
 writetable(TTT,'ttt.xls')
 T_err = table(err(:,1),err(:,2),'VariableNames',["R2","RMSE"]);
 delete t_err.xls
-writetable(TTT,'t_err.xls')
+writetable(T_err,'t_err.xls')
 
 %% Extras
 % sweep k and use alpha steps
@@ -1305,15 +1303,14 @@ ones_vec = ones(size(SL_vec));
 zeros_vec = zeros(size(SL_vec));
 FZ0 = 220;
 
-fx_vec = zeroes(length(SL_vec),length(SA_vec));
-fy_vec = zeroes(length(SL_vec),length(SA_vec));
+fx_vec = zeros(length(SL_vec),length(SA_vec));
+fy_vec = zeros(length(SL_vec),length(SA_vec));
 
 for i=1:length(SA_vec)
-    for j=1:length(SL_vec)
-        fx_vec(:,i) = MF96_FXcomb_vect(SL_vec, SA_vec(j).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
-        fy_vec(:,i) = MF96_FYcomb_vect(SL_vec, SA_vec(j).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
-    end
+    fx_vec(:,i) = MF96_FXcomb_vect(SL_vec, SA_vec(i).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+    fy_vec(:,i) = MF96_FYcomb_vect(SL_vec, SA_vec(i).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
 end
+
 
 % figure('Name','Friction Ellipse')
 % plot(fy_vec,fx_vec)
