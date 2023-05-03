@@ -468,6 +468,9 @@ cut = 104:840;
 ALPHA_vec = TDataTmp.SA(cut);
 MZ_vec    = TDataTmp.MZ(cut);
 FZ0       = mean(TDataTmp.FZ(cut));
+idx = ALPHA_vec>-12.5*to_rad & ALPHA_vec<12.5*to_rad;
+MZ_vec    = MZ_vec(idx,:);
+ALPHA_vec = ALPHA_vec(idx,:);
 
 % Guess values for parameters to be optimised
 %    [qBz1,qBz9,qBz10,qCz1,qDz1,qDz6,qEz1,qEz4,qHz1]
@@ -521,7 +524,7 @@ FZ_vec      = TDataTmp.FZ(cut);
 MZ_vec      = TDataTmp.MZ(cut);
 zeros_vec = zeros(size(ALPHA_vec));
 % cut bad parts
-idx = ALPHA_vec>-12*to_rad & ALPHA_vec<12*to_rad;
+idx = ALPHA_vec>-12.5*to_rad & ALPHA_vec<12.5*to_rad;
 MZ_vec    = MZ_vec(idx,:);
 ALPHA_vec = ALPHA_vec(idx,:);
 FZ_vec    = FZ_vec(idx,:);
@@ -592,6 +595,10 @@ ALPHA_vec   = TDataTmp.SA(cut);
 GAMMA_vec   = TDataTmp.IA(cut);
 MZ_vec      = TDataTmp.MZ(cut);
 FZ_vec      = TDataTmp.FZ(cut);
+idx = ALPHA_vec>-12.5*to_rad & ALPHA_vec<12.5*to_rad;
+MZ_vec    = MZ_vec(idx,:);
+ALPHA_vec = ALPHA_vec(idx,:);
+FZ_vec    = FZ_vec(idx,:);
 
 % Guess values for parameters to be optimised
 %    [qHz3, qHz4, qBz4, qBz5, qDz3, qDz4,qEz5, qDz8, qDz9]
@@ -1148,7 +1155,7 @@ err = [err ; R2 RMSE];
 % figure('Name','Kx vs Fz')
 % plot(load_vec,Kx_vec,'o-')
 
-%% FX - Combined Slip Longitudinal Force !!FIX WEIGHTS!!
+%% FX - Combined Slip Longitudinal Force
 % Fz=220N, variable alpha, p=12psi, gamma=0
 % Fit Longitudal Force with Combined Slip for VARIABLE slip angle ALPHA
 [TDataTmp, ~] = intersect_table_data(GAMMA_0, FZ_220);
