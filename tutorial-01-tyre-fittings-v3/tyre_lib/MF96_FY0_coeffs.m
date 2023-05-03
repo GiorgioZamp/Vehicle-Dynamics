@@ -1,5 +1,5 @@
 % Coefficients for Magic Formula pure lateral force
-function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y] = MF96_FY0_coeffs(kappa, alpha, phi, Fz, tyre_data)
+function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y, Kya] = MF96_FY0_coeffs(kappa, alpha, phi, Fz, tyre_data)
 
  % precode
 
@@ -30,9 +30,6 @@ function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y] = MF96_FY0_coeffs(kappa, al
   LKA             = tyre_data.LKA;
   LMUY            = tyre_data.LMUY;
   LVY             = tyre_data.LVY;
-  
-  %Fz01            = tyre_data.Fz01;
-
 
 
  % main code
@@ -45,10 +42,10 @@ function [alpha__y, By, Cy, Dy, Ey, SHy, SVy, mu__y] = MF96_FY0_coeffs(kappa, al
   SVy = Fz * (pVy1 + pVy2 * dfz + (dfz * pVy4 + pVy3) * gamma__s) * LVY * LMUY;
   alpha__y = alpha + SHy;
   Cy = pCy1 * LCY;
-  mu__y = (dfz * pDy2 + pDy1) * (-pDy3 * gamma__s .^ 2 + 1) * LMUY;
+  mu__y = (dfz * pDy2 + pDy1) * (1 - pDy3 * gamma__s.^2) * LMUY;
   Dy = mu__y * Fz;
-  Ey = (dfz * pEy2 + pEy1) * (1 - (-pEy4 * gamma__s + pEy3) * Sign(alpha__y)) * LEY; % fixed a minus pEy4
-  Kya = FZ01 * pKy1 * sin(0.2e1 .* atan((Fz / (FZ01*pKy2)))) .* (1 - pKy3 .* abs(gamma__s)) .* LFZ0 .* LKA;
+  Ey = (dfz * pEy2 + pEy1) * (1 - (pEy3 - pEy4 * gamma__s) * Sign(alpha__y)) * LEY;
+  Kya = FZ01 * pKy1 * sin(2*atan((1+dfz) / pKy2)) .* (1 - pKy3 .* abs(gamma__s)) .* LFZ0 .* LKA;
   By = Kya / (Cy * Dy);
   
  end

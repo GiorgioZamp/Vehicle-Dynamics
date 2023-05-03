@@ -1,4 +1,4 @@
-function res = resid_comb_Fx(P,fx0,FX,KAPPA,ALPHA,FZ,tyre_data)
+function res = resid_comb_Fx(P,FX,KAPPA,ALPHA,FZ,tyre_data)
 
     % ----------------------------------------------------------------------
     %% Compute the residuals - least squares approach - to fit the Fx Combined curve 
@@ -18,7 +18,7 @@ function res = resid_comb_Fx(P,fx0,FX,KAPPA,ALPHA,FZ,tyre_data)
     % Longitudinal Force (Combined Slip) Equations
     res = 0;
     for i=1:length(KAPPA)
-       fx  = MF96_FXcomb(fx0(i), KAPPA(i), ALPHA(i), 0, FZ, tmp_tyre_data);
+       fx  = MF96_FXcomb(KAPPA(i), ALPHA(i), 0, FZ, tmp_tyre_data);
        res = res+(fx-FX(i))^2;
     end
     

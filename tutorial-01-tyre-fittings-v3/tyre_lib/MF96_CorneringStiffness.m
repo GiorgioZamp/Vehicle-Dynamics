@@ -1,5 +1,5 @@
 % Pure longitudinal force FX0
-% this function remap the sclar function to its vectorial form
+% this function remap the scalar function to its vectorial form
 function [Calfa_vec] = MF96_CorneringStiffness(kappa_vec, alpha_vec, phi_vec, Fz_vec, tyre_data)
 
   

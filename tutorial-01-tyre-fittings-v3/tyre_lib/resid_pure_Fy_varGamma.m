@@ -10,7 +10,7 @@ function res = resid_pure_Fy_varGamma(P,FY,ALPHA,GAMMA,FZ,tyre_data)
     %Fz0 = 200*4.44822; % Nominal load 200 lbf
     
     tmp_tyre_data = tyre_data;
-    % assigne computed parameter
+    
     tmp_tyre_data.pDy3 = P(1); 
     tmp_tyre_data.pEy3 = P(2);
     tmp_tyre_data.pEy4 = P(3); 

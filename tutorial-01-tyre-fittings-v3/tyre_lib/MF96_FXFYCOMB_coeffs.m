@@ -1,5 +1,5 @@
 % Coefficients for Magic Formula Pure Aligning Moment
-function [Gxa, Gyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_data)
+function [Gxa, Gyk, SHyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_data)
 
  % precode
   FZ0             = tyre_data.FZ0;
@@ -30,17 +30,20 @@ function [Gxa, Gyk, SVyk] = MF96_FXFYCOMB_coeffs(kappa, alpha, phi, Fz, tyre_dat
 
   FZ01 = (LFZ0 * FZ0);
   dfz = Fz / FZ01 - 1;
+
   SHxa = rHx1;
-  Bxa = rBx1 * (kappa ^ 2 * rBx2 ^ 2 + 1) ^ (-0.1e1 / 0.2e1) * LXA;
+  %Bxa = rBx1 * (kappa ^ 2 * rBx2 ^ 2 + 1) ^ (-0.1e1 / 0.2e1) * LXA;
+  Bxa = rBx1*cos(atan(kappa*rBx2))*LXA;
   Cxa = rCx1;
-  Dxa = 0.1e1 / cos(Cxa * atan((Bxa * SHxa)));
-  Gxa = Dxa * cos(Cxa * atan((Bxa * (alpha + SHxa))));
+  Dxa = 1 / cos(Cxa * atan((Bxa * SHxa)));
+  Gxa = Dxa * cos(Cxa * atan(Bxa * (alpha + SHxa)));
+
   SHyk = rHy1;
-  DVyk = mu__y * Fz * (dfz * rVy2 + phi * rVy3 + rVy1) * (alpha ^ 2 * rVy4 ^ 2 + 1) ^ (-0.1e1 / 0.2e1);
+  DVyk = mu__y * Fz * (dfz * rVy2 + phi * rVy3 + rVy1) * cos(atan(rVy4*alpha)); %(alpha ^ 2 * rVy4 ^ 2 + 1) ^ (-0.1e1 / 0.2e1);
   SVyk = DVyk * sin(rVy5 * atan((rVy6 * kappa))) * LVYK;
-  Byk = rBy1 * (1 + rBy2 ^ 2 * (alpha - rBy3) ^ 2) ^ (-0.1e1 / 0.2e1) * LYK;
+  Byk = rBy1 * cos(atan(rBy2*(alpha-rBy3))); %(1 + rBy2 ^ 2 * (alpha - rBy3) ^ 2) ^ (-0.1e1 / 0.2e1) * LYK;
   Cyk = rCy1;
-  Dyk = 0.1e1 / cos(Cyk * atan((Byk * SHyk)));
+  Dyk = 1 / cos(Cyk * atan((Byk * SHyk)));
   Gyk = Dyk * cos(Cyk * atan((Byk * (kappa + SHyk))));
   
  end

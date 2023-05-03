@@ -1,4 +1,4 @@
-function res = resid_comb_Fy(P,fy0,FY,KAPPA,ALPHA,FZ,tyre_data)
+function res = resid_comb_Fy(P,FY,KAPPA,ALPHA,FZ,tyre_data)
 
     % ----------------------------------------------------------------------
     %% Compute the residuals - least squares approach - to fit the Fy Combined curve 
@@ -20,10 +20,10 @@ function res = resid_comb_Fy(P,fy0,FY,KAPPA,ALPHA,FZ,tyre_data)
     tmp_tyre_data.rVy5 = P(8);
     tmp_tyre_data.rVy6 = P(9);
 
-    % Longitudinal Force (Combined Slip) Equations
+    % Lateral Force (Combined Slip) Equations
     res = 0;
-    for i=1:length(ALPHA)
-       fy  = MF96_FYcomb(fy0(i), KAPPA, ALPHA(i), 0, FZ, tmp_tyre_data);
+    for i=1:length(KAPPA)
+       fy  = MF96_FYcomb(KAPPA(i), ALPHA(i), 0, FZ, tmp_tyre_data);
        res = res+(fy-FY(i))^2;
     end
     
