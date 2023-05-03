@@ -1217,14 +1217,14 @@ for i=1:length(SL_vec)
     [Gxa(i,2),~,~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_3neg.SA), 0, FZ0, tyre_coeffs);
     [Gxa(i,3),~,~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_6neg.SA), 0, FZ0, tyre_coeffs);
 end
-figure('Name','Gxa(k)')
+f = figure('Name','Gxa(k)');
 plot(SL_vec,Gxa)
 xlabel('k')
 ylabel('Gxa')
 legend(['$\alpha$',' = ',num2str(0),' deg'],['$\alpha$',' = ',num2str(3),...
     ' deg'],['$\alpha$',' = ',num2str(6),' deg'],'Location','best')
 title('Gxa(k)')
-
+exportgraphics(f,'GraphsISO/Gxa_weight.eps')
 %% FY - Combined Slip Lateral Force 
 [TDataTmp, ~] = intersect_table_data(GAMMA_0, FZ_220);
 
@@ -1287,12 +1287,12 @@ for i=1:length(SL_vec)
     [~,Gyk(i,2),~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_3neg.SA), 0, FZ0, tyre_coeffs);
     [~,Gyk(i,3),~] = MF96_FXFYCOMB_coeffs(SL_vec(i), mean(SA_6neg.SA), 0, FZ0, tyre_coeffs);
 end
-figure('Name','Gyk(k)')
+f = figure('Name','Gyk(k)');
 plot(SL_vec,Gyk)
 xlabel('k')
 ylabel('Gyk')
 title('Gyk(k)')
-
+exportgraphics(f,'GraphsISO/Gyk_weight.eps')
 %% Save tyre data structure to mat file
 save(['tyre_' tyre_name,'.mat'],'tyre_coeffs');
 TTT = rows2vars(struct2table(tyre_coeffs));
@@ -1302,25 +1302,85 @@ T_err = table(err(:,1),err(:,2),'VariableNames',["R2","RMSE"]);
 delete t_err.xls
 writetable(T_err,'t_err.xls')
 
-%% Extras
-% sweep k and use alpha steps
-SL_vec = -15*to_rad:0.001:15*to_rad;
-SA_vec = (-6:1:6)*to_rad;
-ones_vec = ones(size(SL_vec));
-zeros_vec = zeros(size(SL_vec));
+%% Friction Ellipse
+% % sweep k and use alpha steps
+% SL_vec = (-10*to_rad:0.001:10)*to_rad;
+% SA_vec = (-6:1:6)*to_rad;
+% IA_vec = (-5:1:5)*to_rad;
+% ones_vec = ones(size(SL_vec));
+% zeros_vec = zeros(size(SL_vec));
+% 
+% FZ = [220, 440, 700, 900, 1120];
+% 
+% fx_vec = zeros(length(SL_vec),length(SA_vec));
+% fy_vec = zeros(length(SL_vec),length(SA_vec));
+% figure('Name','Friction Ellipse')
+% hold on
+% col = jet(length(FZ));
+% % for n = 1:length(FZ)
+% %     FZ0 = FZ(n);
+% %     for i=1:length(SA_vec)
+% %         fx_vec(:,i) = MF96_FXcomb_vect(SL_vec, SA_vec(i).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+% %         fy_vec(:,i) = MF96_FYcomb_vect(SL_vec, SA_vec(i).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+% %     end
+% %     plot(fy_vec,fx_vec,'Color',col(n,:))
+% % end
+% SL_vec = (-10*to_rad:1:10)*to_rad;
+% SA_vec = (-6:1e-3:6)*to_rad;
+% ones_vec = ones(size(SL_vec));
+% zeros_vec = zeros(size(SL_vec));
+% fx_vec = zeros(length(SL_vec),length(SA_vec));
+% fy_vec = zeros(length(SL_vec),length(SA_vec));
+% for n = 1:length(FZ)
+%     FZ0 = FZ(n);
+%     for i=1:length(SL_vec)
+%         fx_vec(:,i) = MF96_FXcomb_vect(SL_vec(i).*ones_vec, SA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+%         fy_vec(:,i) = MF96_FYcomb_vect(SL_vec(i).*ones_vec, SA_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+%     end
+%     plot(fy_vec,fx_vec,'Color',col(n,:))
+% end
+% 
+
+
+
+
+% figure('Name','Gamma')
+% hold on
+% fx_vec = zeros(length(SL_vec),length(SA_vec));
+% fy_vec = zeros(length(SL_vec),length(SA_vec));
+% for n = 1:length(FZ)
+%     FZ0 = FZ(n);
+%     for i=1:length(IA_vec)
+%         fx_vec(:,i) = MF96_FXcomb_vect(SL_vec, zeros_vec, IA_vec(i).*ones_vec, FZ0.*ones_vec, tyre_coeffs);
+%         fy_vec(:,i) = MF96_FYcomb_vect(SL_vec, zeros_vec, IA_vec(i).*ones_vec, FZ0.*ones_vec, tyre_coeffs);
+%     end
+%     plot(fy_vec,fx_vec,'Color',col(n,:))
+% end
+% xlabel('$F_y$')
+% ylabel('$F_x$')
+
+
+
+
+%% Fy(alpha)
+SL_vec = (-6:1:6);
+SA_vec = (-6:1e-3:6)*to_rad;
+ones_vec  = ones(size(SA_vec));
+zeros_vec = zeros(size(SA_vec));
 FZ0 = 220;
 
-fx_vec = zeros(length(SL_vec),length(SA_vec));
 fy_vec = zeros(length(SL_vec),length(SA_vec));
-
-for i=1:length(SA_vec)
-    fx_vec(:,i) = MF96_FXcomb_vect(SL_vec, SA_vec(i).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
-    fy_vec(:,i) = MF96_FYcomb_vect(SL_vec, SA_vec(i).*ones_vec, zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+for i = 1:length(SL_vec)
+    fy_vec(i,:) = MF96_FYcomb_vect(SL_vec(i).*ones_vec*to_rad, SA_vec,zeros_vec, FZ0.*ones_vec, tyre_coeffs);
+    leg{i} = ['k = ',num2str(SL_vec(i))];
 end
 
-
-% figure('Name','Friction Ellipse')
-% plot(fy_vec,fx_vec)
-
-
-
+% Plot Raw and Fitted Data
+f = figure;
+grid on
+plot(SA_vec,fy_vec,'LineWidth',1.5);
+xlabel('$\alpha (rad)$ ')
+ylabel('$F_y(N)$')
+legend(leg)
+title('Combined Slip Lateral Force')
+exportgraphics(f,'GraphsISO/Fy_alpha.eps')
