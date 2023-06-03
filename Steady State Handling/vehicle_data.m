@@ -5,11 +5,11 @@
 Lf       =  1.0   ; % [m]     distance of vehicle c.g from front axle
 Lr       =  0.7   ; % [m]     distance of vehicle c.g rear front axle
 h_G      =  0.295 ; % [m]     vehicle centre of gravity height
-m_s      =  225 ; % [kg]     sprung mass 
-Jx_s     =  65  ; % [kgm^2]  sprung mass roll inertia
-Jy_s     =  90  ; % [kgm^2]  sprung mass pitch inertia
-Jz_s     =  130 ; % [kgm^2]  sprung mass yaw inertia
-Jxz_s    =  20  ; % [kgm^2]   sprung mass ox-oz product of inertia
+m_s      =  225   ; % [kg]     sprung mass 
+Jx_s     =  65    ; % [kgm^2]  sprung mass roll inertia
+Jy_s     =  90    ; % [kgm^2]  sprung mass pitch inertia
+Jz_s     =  130   ; % [kgm^2]  sprung mass yaw inertia
+Jxz_s    =  20    ; % [kgm^2]   sprung mass ox-oz product of inertia
 m_uf     =  14     ; % [kg]   front single unsprung mass
 Jxu_f    =  0.2    ; % [kgm^2] front unsprung mass cambering moment of inertia
 Jyu_f    =  0.2    ; % [kgm^2] front unsprung mass pitching moment of inertia 
@@ -19,7 +19,7 @@ Jxu_r    =  0.3    ; % [kgm^2] rear unsprung mass cambering moment of inertia
 Jyu_r    =  0.3    ; % [kgm^2] rear unsprung mass pitching moment of inertia 
 Jzu_r    =  0.5    ; % [kgm^2] rear unsprung mass yawing moment of inertia 
 Jw_f     =  0.25   ; % [kgm^2] front wheel spin moment of inertia
-Jw_f     =  0.25   ; % [kgm^2] rear wheel spin moment of inertia 
+Jw_r     =  0.25   ; % [kgm^2] rear wheel spin moment of inertia 
 W_f      =  1.260  ; %  [m]      front track width
 W_r      =  1.210  ; %  [m]     rear track width
 delta_f0 =  0      ; % [deg]  static front toe angle
@@ -41,7 +41,7 @@ Jr_f           = 30; % [kgm^2] front half roll inertia
 Jr_r           = 30; % [kgm^2] rear half roll inertia
 J_z            = 165; % [kgm^2]total yaw inertia
 epsilon_roll_f = 0.05; %[-]front roll steer coefficient 
-epsilon_roll_f = 0.1; %[-] rear roll steer coefficient
+epsilon_roll_r = 0.1; %[-] rear roll steer coefficient
 
 
 %  Front left suspension hard points, rest configuration [X,Y,Z]=[mm,mm,mm]

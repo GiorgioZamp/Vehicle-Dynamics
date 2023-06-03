@@ -2,7 +2,7 @@ function vehicle_data = getVehicleDataStruct()
 
 % ----------------------------------------------------------------
 %% Function purpose: define a struct containing vehicle data. 
-%                    All parameters refer to the vehicle Chimera Evoluzione
+%  All parameters refer to the vehicle Chimera Evoluzione
 % ----------------------------------------------------------------
 
 % ----------------------------------------------------------------
@@ -27,8 +27,7 @@ load_MF96_tyre_data;
 % ----------------------------------------------------------------
 
 % REAR SUSPENSIONS
-rear_suspension.Ks_r      = ((26000)^(-1) + (100*10^3)^(-1))^(-1); % [N/m] Rear suspension+tire 
-                                                                   % stiffness (2 springs in series)
+rear_suspension.Ks_r      = ((26000)^(-1) + (100*10^3)^(-1))^(-1); % [N/m] Rear suspension+tire stiffness (2 springs in series)
 rear_suspension.Cs_r      = 2125;  % [N*s/m] Rear suspension damping
 rear_suspension.Cs_r_b    = 1750;  % [N*s/m] Rear suspension damping bound
 rear_suspension.Cs_r_r    = 2500;  % [N*s/m] Rear suspension damping rebound
@@ -41,8 +40,7 @@ rear_suspension.z__rlx_r  = 0.175; % [m] spring free length
 rear_suspension.reg_fact  = 1e5;   % [1/m] regularized sign steepness factor (equal for front and rear)
 
 % FRONT SUSPENSIONS
-front_suspension.Ks_f     = ((20000)^(-1) + (100*10^3)^(-1))^(-1); % [N/m] Rear suspension+tire
-                                                                   % stiffness (2 springs in series)
+front_suspension.Ks_f     = ((20000)^(-1) + (100*10^3)^(-1))^(-1); % [N/m] Rear suspension+tire stiffness (2 springs in series)
 front_suspension.Cs_f     = 2125;         % [N*s/m] Front suspension dumping (mean for state space tuning)
 front_suspension.Cs_f_b   = 1750;         % [N*s/m] Rear suspension damping bound
 front_suspension.Cs_f_r   = 2500;         % [N*s/m] Rear suspension damping rebound
@@ -92,9 +90,9 @@ chassis.is_xz = 0.9*60;     % [kg*m^2] chassis product of inertia xz
 %       |  0   0  iwd |
 
 % REAR WHEELS
-m_wr = 30;               % [kg] Wheel mass
-w_wr = 6*25.4*10^(-3);  % [m] Wheel width
-rr   = tyre_data_r.R0;  % [m] Rear Wheel Radius    
+m_wr = 30;              % [kg] Wheel mass
+w_wr = 6*25.4*10^(-3);  % [m]  Wheel width
+rr   = tyre_data_r.R0;  % [m]  Rear Wheel Radius    
 rear_wheel.Rr            = rr;                
 rear_wheel.width         = w_wr;          
 rear_wheel.mass          = m_wr;  

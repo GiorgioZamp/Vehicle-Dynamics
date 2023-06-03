@@ -7,7 +7,7 @@
 %  rev 1.0:    13/10/2020
 %  rev 2.0:    16/05/2022
 %  rev 2.1:    08/07/2022 (Biral)
-%       - added Fz saturation. Correceted error in Fx
+%       - added Fz saturation. Corrected error in Fx
 %       - initial condition is now parametric in initial speed
 %       - changed the braking torque parameters to adapt to a GP2 model
 % ----------------------------------------------------------------

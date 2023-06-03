@@ -1,7 +1,7 @@
 function ICs = loadInitialConditions(u0)
 
     % ----------------------------------------------------------------
-    %% Function purpose: define the initial conditions for vehicle states
+    % Function purpose: define the initial conditions for vehicle states
     % ----------------------------------------------------------------
 
     %% Load vehicle and auxiliary data

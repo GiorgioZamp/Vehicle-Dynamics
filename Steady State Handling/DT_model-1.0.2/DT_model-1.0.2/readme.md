@@ -4,8 +4,8 @@
 
  - Francesco Biral       <francesco.biral@unitn.it>
  - Edaordo Pagot         <edoardo.pagot@unitn.it>
- - Mattia Piccinini     <mattia.piccinini@unitn.it>
- - Gastone Rosati Papini  <gastone.rosatipapini@unitn.it>
+ - -Mattia Piccinini     <mattia.piccinini@unitn.it>
+ - GastoneRosati Papini  <gastone.rosatipapini@unitn.it>
 
 ## Description
 Double track model with Simulink structure including ABS and ESP control blocks.
