@@ -78,7 +78,7 @@ vehicle_data = getVehicleDataStruct();
 % ----------------------------
 %       flg = 2; % flag for simulation profile selection
 
-%  %% Define initial conditions for the simulation
+%     % Define initial conditions for the simulation
 %     % ----------------------------
 %     V0 = 50/3.6; % Initial speed
 %     X0 = loadInitialConditions(V0);
@@ -92,7 +92,7 @@ vehicle_data = getVehicleDataStruct();
 %     slope = 0.1;    % Slope of steer ramp
 %     
 %     % ----------------------------
-%     %% Simulation parameters
+%     % Simulation parameters
 %     % ----------------------------
 %     simulationPars = getSimulationParams(); 
 %     Ts = simulationPars.times.step_size;  % integration step for the simulation (fixed step)
@@ -100,7 +100,7 @@ vehicle_data = getVehicleDataStruct();
 %     Tf = simulationPars.times.tf;         % stop time of the simulation
 %     
 %     % ----------------------------
-%     %% Start Simulation
+%     % Start Simulation
 %     % ----------------------------
 %     fprintf('Starting Simulation\n')
 %     tic;
@@ -110,7 +110,7 @@ vehicle_data = getVehicleDataStruct();
 %     fprintf('The total simulation time was %.2f seconds\n',elapsed_time_simulation)
 %     
 %     % ----------------------------
-%     %% Post-Processing
+%     % Post-Processing
 %     % ----------------------------
 %     dataAnalysis(model_sim,vehicle_data,Ts);
 %     vehicleAnimation(model_sim,vehicle_data,Ts);

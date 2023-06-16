@@ -10,8 +10,16 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     Wf = vehicle_data.vehicle.Wf;  % [m] Width of front wheels axle 
     Wr = vehicle_data.vehicle.Wr;  % [m] Width of rear wheels axle                   
     m  = vehicle_data.vehicle.m;   % [kg] Vehicle Mass
+    m_s = 225;                     % [kg] Sprung Mass (Not present in struct)
     g  = vehicle_data.vehicle.g;   % [m/s^2] Gravitational acceleration
     tau_D = vehicle_data.steering_system.tau_D;  % [-] steering system ratio (pinion-rack)
+    h_G = vehicle_data.vehicle.hGs; % [m] CoM Height
+    h_rf = vehicle_data.front_suspension.h_rc_f; % [m] front suspension roll height
+    h_rr = vehicle_data.rear_suspension.h_rc_r;  % [m] rear suspension roll height
+    h_r = h_rr+(h_rf-h_rr)*Lr/L; % [m] CoM height wrt RC
+    h_s = h_G - h_r;
+    K_sf = vehicle_data.front_suspension.Ks_f; % [N/m] Front suspension+tire stiffness
+    K_sr = vehicle_data.rear_suspension.Ks_r; % [N/m] Rear suspension+tire stiffness
 
     % ---------------------------------
     %% Extract data from simulink model
@@ -115,7 +123,22 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % ---------------------------------
     %% Lateral Load Transfer
     % --------------------------
+    e_phi = K_sf/(K_sf+K_sr); %Roll stiffness ratio
+    
+    dFz_f = m_s.*Ay_ss.*((Lr*h_rf)/(L*Wf) + h_s/Wf*e_phi);
+    dFz_r = m_s.*Ay_ss.*((Lf*h_rr)/(L*Wr) + h_s/Wr*(1-e_phi));
 
+    % Plot
+    f = figure('Name','Lateral Load Transfer');
+    hold on
+    plot(time_sim,dFz_f)
+    plot(time_sim,dFz_r)
+    xlabel('$t [s]$')
+    ylabel(['$\Delta F_zf [N]$','$,}$','$\Delta F_zr [N]$'])
+    legend('Front','Rear')
+    title('Lateral Load Transfer')
+    exportgraphics(f,'Graphs/LateralLoadTransf.eps')
+    hold off
     % --------------------------
     %% Normalized Axle Characteristics
     % --------------------------------
@@ -135,5 +158,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
 
     % --------------------------------
     %% Beta Gain
-    
+    % --------------------------------
+
+    % --------------------------------
 end

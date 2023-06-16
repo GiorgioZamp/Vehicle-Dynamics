@@ -5,7 +5,7 @@
 new_vehicle.Lf       =  1.0   ; % [m]     distance of vehicle c.g from front axle
 new_vehicle.Lr       =  0.7   ; % [m]     distance of vehicle c.g rear front axle
 new_vehicle.h_G      =  0.295 ; % [m]     vehicle centre of gravity height
-new_vehicle.m_s      =  225 ; % [kg]     sprung mass 
+new_vehicle.m_s      =  225 ;   % [kg]     sprung mass 
 new_vehicle.Jx_s     =  65  ; % [kgm^2]  sprung mass roll inertia
 new_vehicle.Jy_s     =  90  ; % [kgm^2]  sprung mass pitch inertia
 new_vehicle.Jz_s     =  130 ; % [kgm^2]  sprung mass yaw inertia
