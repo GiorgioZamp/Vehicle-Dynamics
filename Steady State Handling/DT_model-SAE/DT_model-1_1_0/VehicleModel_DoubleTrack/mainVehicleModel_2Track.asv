@@ -1,5 +1,5 @@
-%% DOUBLE TRACK VEHICLE MODEL
-% Main script for a basic simulation framework with a double track vehcile model
+% ----------------------------------------------------------------
+%% Main script for a basic simulation framework with a double track vehcile model
 %  authors: 
 %  rev. 1.0 Mattia Piccinini & Gastone Pietro Papini Rosati
 %  rev. 2.0 Edoardo Pagot
@@ -15,10 +15,8 @@
 % ----------------------------
 %% Initialization
 % ----------------------------
-clc
-close all
-clear
 initialize_environment;
+
 % ----------------------------
 %% Load vehicle data
 % ----------------------------
@@ -33,22 +31,21 @@ vehicle_data = getVehicleDataStruct();
 %% SPEED RAMP TEST
     % ----------------------------
     flg = 1; % flag for simulation profile selection
-    % P=0.0436462066049939 I=0.0175035310088279 D=-0.00909870879334459 N=2
     % ----------------------------
     % Define initial conditions for the simulation
     % ----------------------------
     V0 = 50/3.6;        % [m/s] Initial speed
     X0 = loadInitialConditions(V0);
-    steer_des = 10;     % [°] desired steer angle
+    steer_des = 10;     % [°] desired steer angle +1 m/s each 10 s
     
     % ----------------------------
     % Define the desired speed
     % ----------------------------
     V_des = 50/3.6; % Desired speed for controller (kept for ease)
-    slope = 0.1;    % Slope of speed ramp +1 m/s each 10 s [m/s^2]
+    slope = 0.1;    % Slope of speed ramp [m/s^2]
 
     % ----------------------------
-    % Simulation parameters
+    %% Simulation parameters
     % ----------------------------
     simulationPars = getSimulationParams(); 
     Ts = simulationPars.times.step_size;  % integration step for the simulation (fixed step)
@@ -56,22 +53,21 @@ vehicle_data = getVehicleDataStruct();
     Tf = simulationPars.times.tf;         % stop time of the simulation
     
     % ----------------------------
-    % Start Simulation
+    %% Start Simulation
     % ----------------------------
     fprintf('Starting Simulation\n')
     tic;
-    model_sim = sim('Vehicle_Model_2Track_OLD');
+    model_sim = sim('Vehicle_Model_2Track');
     elapsed_time_simulation = toc;
     fprintf('Simulation completed\n')
     fprintf('The total simulation time was %.2f seconds\n',elapsed_time_simulation)
     
     % ----------------------------
-    % Post-Processing
+    %% Post-Processing
     % ----------------------------
     dataAnalysis(model_sim,vehicle_data,Ts);
-%     vehicleAnimation(model_sim,vehicle_data,Ts); %Clothoids Toolbox not
-%     working
-    handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
+    vehicleAnimation(model_sim,vehicle_data,Ts);
+    handling_diagram()
     % ----------------------------
 
 %% STEER RAMP TEST
@@ -82,13 +78,12 @@ vehicle_data = getVehicleDataStruct();
 %     % ----------------------------
 %     V0 = 50/3.6; % Initial speed
 %     X0 = loadInitialConditions(V0);
-%     
+%     steer_des = 10;     % [°] desired steer angle
 %     
 %     % ----------------------------
 %     % Define the desired steer
 %     % ----------------------------
 %     V_des = 50/3.6; % Desired speed for controller
-%     steer_des = 10;     % [°] desired steer angle
 %     slope = 0.1;    % Slope of steer ramp
 %     
 %     % ----------------------------
@@ -104,7 +99,7 @@ vehicle_data = getVehicleDataStruct();
 %     % ----------------------------
 %     fprintf('Starting Simulation\n')
 %     tic;
-%     model_sim = sim('Vehicle_Model_2Track_OLD');
+%     model_sim = sim('Vehicle_Model_2Track');
 %     elapsed_time_simulation = toc;
 %     fprintf('Simulation completed\n')
 %     fprintf('The total simulation time was %.2f seconds\n',elapsed_time_simulation)

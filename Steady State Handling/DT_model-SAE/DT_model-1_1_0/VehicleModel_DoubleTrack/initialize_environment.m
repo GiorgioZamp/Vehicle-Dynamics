@@ -25,9 +25,10 @@ addpath(genpath('submodules'));
 % --------------------
 %% Open Simulink model
 % --------------------
-% Check if the Simulink model is already opened. Otherwise open it
+% Check if the Simulink model is already opened. Otherwise open it (_OLD
+% for compatibility with older matlab versions)
 openModels = find_system('SearchDepth', 0);
-if (isempty(find(strcmp(openModels,'Vehicle_Model_2Track'),1)))
-    load_system('Vehicle_Model_2Track');
-    open_system('Vehicle_Model_2Track');
+if (isempty(find(strcmp(openModels,'Vehicle_Model_2Track_OLD'),1)))
+    load_system('Vehicle_Model_2Track_OLD');
+    open_system('Vehicle_Model_2Track_OLD');
 end 
