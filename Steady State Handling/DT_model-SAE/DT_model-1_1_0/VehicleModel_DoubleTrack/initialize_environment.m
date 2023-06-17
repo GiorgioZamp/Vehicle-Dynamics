@@ -23,6 +23,7 @@ addpath(genpath('Longit_Controller'));
 addpath(genpath('Utilities'));
 addpath(genpath('../tyre_model/tyre_lib'));
 addpath(genpath('submodules'));
+addpath(genpath('Graphs'));
 
 % --------------------
 %% Open Simulink model

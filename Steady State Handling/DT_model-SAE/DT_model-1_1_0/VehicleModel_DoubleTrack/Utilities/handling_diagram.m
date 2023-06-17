@@ -125,28 +125,105 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % --------------------------
     e_phi = K_sf/(K_sf+K_sr); %Roll stiffness ratio
     
-    dFz_f = m_s.*Ay_ss.*((Lr*h_rf)/(L*Wf) + h_s/Wf*e_phi);
-    dFz_r = m_s.*Ay_ss.*((Lf*h_rr)/(L*Wr) + h_s/Wr*(1-e_phi));
-
+    dFz_f_n = m_s.*Ay_ss.*((Lr*h_rf)/(L*Wf) + h_s/Wf*e_phi);
+    dFz_r_n = m_s.*Ay_ss.*((Lf*h_rr)/(L*Wr) + h_s/Wr*(1-e_phi));
+    dFz_f = 0.5.*abs(Fz_fr-Fz_fl);
+    dFz_r = 0.5.*abs(Fz_rr-Fz_rl);
+    
     % Plot
-    f = figure('Name','Lateral Load Transfer');
+    f = figure('Name','Lateral Load Transfer in t');
     hold on
-    plot(time_sim,dFz_f)
-    plot(time_sim,dFz_r)
+    plot(time_sim,dFz_f_n,'r--')
+    plot(time_sim,dFz_r_n,'b--')
+    plot(time_sim,dFz_f,'r')
+    plot(time_sim,dFz_r,'b')
     xlabel('$t [s]$')
-    ylabel({'$\Delta F_zf [N]$',',','$\Delta F_zr [N]$'})
-    legend('Front','Rear')
+    ylabel({'$\Delta F_zf$,$\Delta F_zr$ [N]'})
+    legend('FN','RN','FR','RR','Location','best')
     title('Lateral Load Transfer')
     exportgraphics(f,'Graphs/LateralLoadTransf.eps')
     hold off
+
+%     f = figure('Name','Lateral Load Transfer in Ay');
+%     hold on
+%     plot(Ay_ss,dFz_f)
+%     plot(Ay_ss,dFz_r)
+%     xlabel('$a_y [m/s^2]$')
+%     ylabel({'$\Delta F_zf$,$\Delta F_zr$ [N]'})
+%     legend('Front','Rear')
+%     title('Lateral Load Transfer in Ay')
+% %     exportgraphics(f,'Graphs/LateralLoadTransf.eps')
+%     hold off
     % --------------------------
     %% Normalized Axle Characteristics
     % --------------------------------
+    % Side Slip Angles
+    alpha_f = 0.5.*(alpha_fr+alpha_fl); % delta-beta-rho_ss.*Lf;
+    alpha_r = 0.5.*(alpha_rr+alpha_rl); % -beta + rho_ss.*Lr;   %Not sure about this
+
+    % Axle Normal Loads
+    Fz_f = Fz_fl+Fz_fr;
+    Fz_r = Fz_rl+Fz_rr;
+
+    % Axle Characteristics
+    Y_f = m*Ay_ss*Lr/L;
+    Y_r = m*Ay_ss*Lf/L;
+
+    % Real Axle Lateral Forces
+    Fy_f = Fy_fr+Fy_fl;
+    Fy_r = Fy_rr+Fy_rl;
+
+    % Normalized Axle Characteristics
+    mu_f = Y_f./Fz_f;
+    mu_r = Y_r./Fz_r;
+
+    % Plots FIX X AXIS -> NOT CORRECT REPRESENTATION
+    f = figure('Name',' Axle Characteristics');
+    tiledlayout(2,2)
+    nexttile
+    hold on
+    plot(linspace(0,max(alpha_f),length(Y_f)),Y_f,'b')
+    plot(linspace(0,max(alpha_f),length(Fy_f)),Fy_f,'-.','Color',[0 0.4470 0.7410])
+    xlabel('$\alpha [rad]$')
+    ylabel({'$Y_f$,$Fy_f$'})
+    legend('Yf','$Fy_f$','Location','best')
+    title('Axle Characteristics Front')
+    hold off
+
+    nexttile
+    hold on
+    plot(linspace(0,max(abs(alpha_r)),length(Y_r)),Y_r,'r')
+    plot(linspace(0,max(abs(alpha_r)),length(Fy_r)),Fy_r,'-.','Color',[0.957 0.263 0.212])
+    xlabel('$\alpha [rad]$')
+    ylabel({'$Y_r$,$Fy_r$'})
+    legend('Yr','$Fy_r$','Location','best')
+    title('Axle Characteristics Rear')
+    hold off
+
+    nexttile([1,2])
+    hold on
+    plot(linspace(0,0.004,length(mu_f)),mu_f,'b')
+    plot(linspace(0,0.004,length(mu_r)),mu_r,'r')
+    xlabel('$\alpha [rad]$')
+    ylabel({'$\mu_f$,$\mu_r$'})
+    title('Normalized Axle Characteristics')
+    exportgraphics(f,'Graphs/NormAxleChar.eps')
 
     % --------------------------------
     %% Handling Diagram
     % --------------------
+    % Steering Characteristics
+    %rho_ss*L = delta + (alpha_r-alpha_f)
+    rho = (delta + (alpha_r-alpha_f))./L;
+    figure, hold on;
+    plot(Ay_ss./g,rho)
+    plot(Ay_ss./g,delta./L,'g') % Neutral behaviour
 
+    d = rho_ss.*L - (alpha_r-alpha_f);
+    d_Ack = rho_ss.*L;
+    figure, hold on;
+    plot(Ay_ss./g,d)
+    plot(Ay_ss./g,d_Ack,'g') % Neutral behaviour
     % --------------------
     %% Understeering Gradient
     % Compare theoretical and fitted Kus
