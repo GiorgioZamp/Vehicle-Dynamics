@@ -216,47 +216,53 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % Steering Characteristics
     %rho_ss*L = delta + (alpha_r-alpha_f)
     delta_f = deg2rad(mean(delta_D))*tau_D;
-
-%     figure,hold on;
-%     plot(Ay_ss/g,delta-rho_ss.*L,'b')
-%     plot(Ay_ss/g,-Dalpha,'r')
-%     xlabel('$a_y/g$')
-%     ylabel('$\delta_f - \rho_0 L$')
-%     title('Handling Curve')
-
-    
     rho = (delta_f + Dalpha)./L;
-    plot(Ay_ss./g,rho)
-    yline(delta_f/L,'g') % Neutral behaviour
-    xlabel('$a_y/g$')
-    xlim([0,max(Ay_ss/g)])
-    ylabel('$\rho$')
-    legend('Vehicle','Neutral')
-    title('Curvature')
-    hold off
 
-%     d = rho_ss.*L - (alpha_r-alpha_f);
-%     d_Ack = rho_ss.*L;
 %     figure,hold on;
-%     plot(Ay_ss./g,d)
-%     plot(Ay_ss./g,d_Ack,'g') % Neutral behaviour
-%     xlabel('$a_y/g$')
-%     ylabel('$\delta_f$')
-%     legend('Vehicle','Neutral')
-%     title('Steering')
+%     plot()
+%     plot()
+%     xlabel('')
+%     ylabel('')
+%     legend('','')
 %     hold off
+    
     % --------------------
     %% Understeering Gradient
     % Compare theoretical and fitted Kus
     % --------------------------------
+    % Theoretical
+
+    % Fitted
 
     % --------------------------------
-    %% Yaw Gain
-    % --------------------------------
+    %% Yaw Rate Gain
+    % slide99----------------------------
+    YR_gain = rho_ss.*u./delta; %Omega./delta;
+
+    figure('Name','Yaw Rate Gain')
+    plot(u,YR_gain)
+    hold on
+    plot(u,Omega./u,'g')
+    xlabel('$u [m/s]$')
+    ylabel('$\frac{\Omega}{\delta}$')
+    legend('V','N')
+    title('Yaw Rate Gain')
+    hold off
 
     % --------------------------------
-    %% Beta Gain
-    % --------------------------------
+    %% Body Slip Gain
+    % slide101---------------------------
+    BS_gain = beta./delta;
+% 
+%     figure('Name','Body Slip Gain')
+%     plot(u,BS_gain)
+%     hold on
+%     plot(,'g')
+%     xlabel('$u [m/s]$')
+%     ylabel('$\frac{\Beta}{\delta}$')
+%     legend('V','N')
+%     title('Body Slip Gain')
+%     hold off
 
     % --------------------------------
 end
