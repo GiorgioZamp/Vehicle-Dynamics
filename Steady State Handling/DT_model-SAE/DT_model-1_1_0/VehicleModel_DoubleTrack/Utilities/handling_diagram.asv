@@ -224,6 +224,16 @@ function handling_diagram(model_sim,vehicle_data,Ts)
 %     ylabel('$\delta_f - \rho_0 L$')
 %     title('Handling Curve')
 
+%     rho = (delta_f + Dalpha)./L;
+%     figure, hold on;
+%     plot(Ay_ss./g,rho)
+%     plot(Ay_ss./g,delta./L,'g') % Neutral behaviour
+%     xlabel('$a_y/g$')
+%     ylabel('$\rho$')
+%     legend('Vehicle','Neutral')
+%     title('Curvature')
+%     hold off
+
     
     rho = (delta_f + Dalpha)./L;
     plot(Ay_ss./g,rho)
