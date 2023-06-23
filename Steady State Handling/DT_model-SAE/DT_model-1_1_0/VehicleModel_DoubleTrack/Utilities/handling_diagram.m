@@ -277,7 +277,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     xlim([0,0.9])
     ylim('padded')
     xlabel('$\frac{a_y}{g}$')
-    ylabel('$\Delta\alpha$')
+    ylabel('$-\Delta\alpha$')
 %     legend('$\Delta\alpha$','$\rho_0 L-\delta$','Location','best')
     title('Handling Diagram')
     hold off
@@ -285,8 +285,13 @@ function handling_diagram(model_sim,vehicle_data,Ts)
 
     % Curvature
     nexttile(3)
+    hold on
     plot(Ay_ss_aux/g,rho_ss(idx))
+%     temp = gradient(rho_ss(idx));
+%     tt = rho_ss(idx);
+%     plot(Ay_ss_aux/g,temp(1).*Ay_ss_aux/g+tt,'b--')
     yline(mean(delta_use)/L,'g')
+    hold off
     xlabel('$\frac{a_y}{g}$')
     ylabel('$\rho [1/m]$')
     ylim('padded')
@@ -317,32 +322,54 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     %% Understeering Gradient
     % Compare theoretical and fitted Kus
     % --------------------------------
-    % Theoretical
-    Kus = m/(L^2)*(/+/)
+%     global flg;
+%    
+%     switch flg
+%         case flg == 2
+% 
+%             % Theoretical
+%             Kus = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
+%             % -m/(L*tau_D)*(Lf/K_sr - Lr/K_sf);
+%             % -1/(L*tau_D*g)*(1/Cy_r - 1/Cy_f);
+% 
+%             % Fitted
+%             Kus_fit = gradient(delta_use(idx));
+% 
+%             % Plot
+%             f = figure('Name','Understeering Gradient');
+%             hold on
+%             plot(fake_Ay,Kus.*fake_Ay)
+%             plot(fake_Ay,mean(Kus_fit(1:10)).*fake_Ay)
+%             hold off
+%             exportgraphics(f,'Graphs/UndersteeringGrad.eps')
+% 
+%             % p(1) is the slope of the tangent we computed in the handling
+%             % characteristics
+%         otherwise
+%             
+%     end
 
-    % Fitted
-    % p(1) is the slope of the tangent we computed in the handling
-    % characteristics
     % --------------------------------
     %% Yaw Rate Gain
     % slide99----------------------------
-    YR_gain = rho_ss.*u./delta; %Omega./delta;
+    YR_gain = rho_ss.*u./delta_use; %Omega./delta;
 
-    figure('Name','Yaw Rate Gain')
-    plot(u,YR_gain)
+    f = figure('Name','Yaw Rate Gain');
+    plot(u(idx),YR_gain(idx),'r')
     hold on
-    plot(u,Omega./u,'g')
+    plot(u(idx),u(idx)./L,'g')
     xlabel('$u [m/s]$')
     ylabel('$\frac{\Omega}{\delta}$')
-    legend('V','N')
+    legend('Vehicle','Neutral')
     title('Yaw Rate Gain')
     hold off
+    exportgraphics(f,'Graphs/yawrategain.eps')
 
     % --------------------------------
     %% Body Slip Gain
     % slide101---------------------------
-    BS_gain = beta./delta;
-
+    BS_gain = beta./delta_use;
+%     beta_neutral = Lr/L*delta_use-2*
     figure('Name','Body Slip Gain')
     plot(u,BS_gain)
     hold on

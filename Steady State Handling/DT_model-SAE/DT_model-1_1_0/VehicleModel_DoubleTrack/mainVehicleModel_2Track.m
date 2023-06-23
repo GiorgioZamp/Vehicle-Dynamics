@@ -32,7 +32,9 @@ vehicle_data = getVehicleDataStruct();
 % ----------------------------
 %% SPEED RAMP TEST
     % ----------------------------
+    global flg;
     flg = 1; % flag for simulation profile selection
+    
     % P=0.0436462066049939 I=0.0175035310088279 D=-0.00909870879334459 N=2
     % ----------------------------
     % Define initial conditions for the simulation

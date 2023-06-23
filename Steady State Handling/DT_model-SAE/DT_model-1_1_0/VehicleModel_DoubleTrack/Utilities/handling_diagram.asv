@@ -198,6 +198,10 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     mu_f = Y_f./Fz_f;
     mu_r = Y_r./Fz_r;
 
+    % Normalized Cornering Stiffnesses
+    Cy_f = gradient(mu_f);
+    Cy_r = gradient(mu_r);
+
     % PLOTS
     % Axle Characteristics
     f = figure('Name','Axle Characteristics');
@@ -253,47 +257,60 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % ->  delta_Ack = rho_ss*L/tau_H   (when Dalpha=0)
 
     idx = Dalpha>6.2*1e-4;
+    Ay_ss_aux = Ay_ss(idx); % cut
     Dalpha_aux = -Dalpha(idx); % cut
-    tgt =@(x)  (Dalpha_aux(1)-0)/
+
+    % Interpolate tangent
+    x_aux = [0,Ay_ss_aux(1)];
+    y_aux = [0,Dalpha_aux(1)];
+    p = polyfit(x_aux,y_aux,1);
+    linetg = polyval(p,fake_Ay);
 
     f = figure('Name','Steering Characteristics');
     tiledlayout(2,2)
 
     nexttile([1,2])
     hold on
-    plot(Ay_ss(idx)/g,Dalpha_aux,'r')
-    yline(0,'g')
+    plot(Ay_ss_aux./g,Dalpha_aux,'r','LineWidth',1.5)
+    plot(fake_Ay./g,linetg,'b--')
+    yline(0,'g','LineWidth',1)
+    xlim([0,0.9])
     ylim('padded')
     xlabel('$\frac{a_y}{g}$')
     ylabel('$\Delta\alpha$')
-    legend('$\Delta\alpha$','$\rho_0 L-\delta$','Location','best')
+%     legend('$\Delta\alpha$','$\rho_0 L-\delta$','Location','best')
     title('Handling Diagram')
     hold off
     
 
     % Curvature
     nexttile(3)
-    plot(Ay_ss(idx)/g,rho_ss(idx))
+    hold on
+    plot(Ay_ss_aux/g,rho_ss(idx))
+%     temp = gradient(rho_ss(idx));
+%     tt = rho_ss(idx);
+%     plot(Ay_ss_aux/g,temp(1).*Ay_ss_aux/g+tt,'b--')
     yline(mean(delta_use)/L,'g')
-    xlabel('$\frac{a_y}{g} []$')
+    hold off
+    xlabel('$\frac{a_y}{g}$')
     ylabel('$\rho [1/m]$')
     ylim('padded')
     title('Curvature')
  
     % Radius
     nexttile(4)
-    plot(Ay_ss(idx)/g,1./rho_ss(idx))
-    yline(mean(delta_use)/L,'g')
-    xlabel('$\frac{a_y}{g} []$')
+    plot(Ay_ss_aux/g,1./rho_ss(idx))
+    yline(L/mean(delta_use),'g')
+    xlabel('$\frac{a_y}{g}$')
     ylabel('$R [m]$')
     ylim('padded')
     title('Radius')
 
     % Steering
 %     nexttile
-%     plot(Ay_ss(idx)/g,delta_use(idx))
+%     plot(Ay_ss_aux/g,delta_use(idx))
 %     hold on
-%     plot(Ay_ss(idx)/g,rho_ss(idx)*L/tau_D,'g')
+%     plot(Ay_ss_aux/g,rho_ss(idx)*L/tau_D,'g')
 %     xlabel('$\frac{a_y}{g} [ ]$')
 %     ylabel('$\delta [rad]$')
 %     ylim('padded')
@@ -305,9 +322,28 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     %% Understeering Gradient
     % Compare theoretical and fitted Kus
     % --------------------------------
-    % Theoretical
+    global flg;
+    switch flg
+        case flg == 2
+                % Theoretical
+    Kus = m/(L^2)*(Lf/K_sr - Lr/K_sf);
 
     % Fitted
+    Kus_fit = gradient(delta_use(idx));
+
+    % Plot
+    f = figure('Name','Understeering Gradient');
+    hold on
+    plot(fake_Ay,Kus.*fake_Ay)
+    plot()
+    hold off
+    exportgraphics(f,'Graphs/UndersteeringGrad.eps')
+
+    % p(1) is the slope of the tangent we computed in the handling
+    % characteristics
+        otherwise
+            
+    end
 
     % --------------------------------
     %% Yaw Rate Gain
