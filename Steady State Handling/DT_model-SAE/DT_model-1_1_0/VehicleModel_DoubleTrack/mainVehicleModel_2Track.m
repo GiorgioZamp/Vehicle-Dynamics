@@ -69,11 +69,8 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     % Post-Processing
     % ----------------------------
-%     t_remove = 0.4; % cutting time frame
-%     model_sim = data_prep(model_sim,t_remove);
     dataAnalysis(model_sim,vehicle_data,Ts);
-%     vehicleAnimation(model_sim,vehicle_data,Ts); %Clothoids Toolbox not
-%     working
+%     vehicleAnimation(model_sim,vehicle_data,Ts); %Clothoids Toolbox
     handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
     % ----------------------------
 

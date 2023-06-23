@@ -10,8 +10,7 @@ function model_sim_cut = data_prep(model_sim,t_remove)
     time_sim = model_sim.states.u.time;
     dt = time_sim(2)-time_sim(1); % [s] Simulation time step
 
-    
     nsample_remove = t_remove/dt; % number of samples to cut
-%     model_sim_cut = model_sim(nsample_remove:end);
+    model_sim_cut = model_sim(nsample_remove:end);
 
 end

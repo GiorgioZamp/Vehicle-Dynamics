@@ -22,6 +22,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     m_s = 225;                     % [kg] Sprung Mass (Not present in struct)
     g  = vehicle_data.vehicle.g;   % [m/s^2] Gravitational acceleration
     tau_D = vehicle_data.steering_system.tau_D;  % [-] steering system ratio (pinion-rack)
+    tau_H = 1/tau_D;
     h_G = vehicle_data.vehicle.hGs; % [m] CoM Height
     h_rf = vehicle_data.front_suspension.h_rc_f; % [m] front suspension roll height
     h_rr = vehicle_data.rear_suspension.h_rc_r;  % [m] rear suspension roll height
@@ -94,7 +95,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     gamma_fl   = model_sim.extra_params.gamma_fl.data;
     delta_fr   = model_sim.extra_params.delta_fr.data;
     delta_fl   = model_sim.extra_params.delta_fl.data;
-    delta_use  = deg2rad(delta_fr+delta_fl*0.5); % Average Steering Angle in radians
+    delta_use  = deg2rad(delta_fr+delta_fl)*0.5; % Average Steering Angle in radians
 
     % Chassis side slip angle beta [rad]
     beta = atan(v./u);
@@ -290,7 +291,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
 %     temp = gradient(rho_ss(idx));
 %     tt = rho_ss(idx);
 %     plot(Ay_ss_aux/g,temp(1).*Ay_ss_aux/g+tt,'b--')
-    yline(mean(delta_use)/L,'g')
+    yline(deg2rad(mean(delta_D))/(L*tau_D),'g')
     hold off
     xlabel('$\frac{a_y}{g}$')
     ylabel('$\rho [1/m]$')
@@ -300,7 +301,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % Radius
     nexttile(4)
     plot(Ay_ss_aux/g,1./rho_ss(idx))
-    yline(L/mean(delta_use),'g')
+    yline(L/deg2rad(mean(delta_D))*tau_D,'g')
     xlabel('$\frac{a_y}{g}$')
     ylabel('$R [m]$')
     ylim('padded')
@@ -329,8 +330,8 @@ function handling_diagram(model_sim,vehicle_data,Ts)
 % 
 %             % Theoretical
 %             Kus = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
-%             % -m/(L*tau_D)*(Lf/K_sr - Lr/K_sf);
-%             % -1/(L*tau_D*g)*(1/Cy_r - 1/Cy_f);
+%             % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
+%             % -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 % 
 %             % Fitted
 %             Kus_fit = gradient(delta_use(idx));
@@ -369,16 +370,18 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     %% Body Slip Gain
     % slide101---------------------------
     BS_gain = beta./delta_use;
-%     beta_neutral = Lr/L*delta_use-2*
-    figure('Name','Body Slip Gain')
-    plot(u,BS_gain)
+    beta_neutral = rad2deg(Lr/L*delta_use*tau_H - (alpha_f+alpha_r));
+
+    f = figure('Name','Body Slip Gain');
+    plot(u(idx),BS_gain(idx))
     hold on
-%     plot(,'g')
+    plot(u(idx),beta_neutral(idx),'g')
     xlabel('$u [m/s]$')
-    ylabel('$\frac{\Beta}{\delta}$')
-    legend('V','N')
+    ylabel('$\frac{\beta}{\delta}$')
+%     legend('Vehicle','Neutral')
     title('Body Slip Gain')
     hold off
+    exportgraphics(f,'Graphs/bodyslipgain.eps')
 
     % --------------------------------
 end
