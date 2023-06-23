@@ -185,8 +185,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % Axle Normal Loads
     Fz_f = Fz_fl + Fz_fr;
     Fz_r = Fz_rl + Fz_rr;
-%     Fz_f = m*g*Lr/L;
-%     Fz_r = m*g*Lf/L;
+    Fz_f = m*g*Lr/
 
     % Simulation Axle Lateral Forces
     Fy_f = Fy_fr + Fy_fl;

@@ -40,12 +40,11 @@ vehicle_data = getVehicleDataStruct();
     V0 = 50/3.6;        % [m/s] Initial speed
     X0 = loadInitialConditions(V0);
     steer_des = 10;     % [°] desired steer angle
-    
     % ----------------------------
     % Define the desired speed
     % ----------------------------
     V_des = 50/3.6; % Desired speed for controller (kept for ease)
-    slope = 0.1;    % Slope of speed ramp +1 m/s each 10 s [m/s^2]
+    slope = 0.5;    % Slope of speed ramp +1 m/s each 10 s [m/s^2]
 
     % ----------------------------
     % Simulation parameters
@@ -68,6 +67,8 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     % Post-Processing
     % ----------------------------
+%     t_remove = 0.4; % cutting time frame
+%     model_sim = data_prep(model_sim,t_remove);
     dataAnalysis(model_sim,vehicle_data,Ts);
 %     vehicleAnimation(model_sim,vehicle_data,Ts); %Clothoids Toolbox not
 %     working
