@@ -152,7 +152,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     ylabel({'$\Delta F_zf$,$\Delta F_zr$ [N]'})
     legend('FN','RN','FR','RR','Location','best')
     title('Lateral Load Transfer')
-%     exportgraphics(f,'Graphs/LateralLoadTransfT.eps')
+    exportgraphics(f,'Graphs/LateralLoadTransfT.eps')
     hold off
 
     f = figure('Name','Lateral Load Transfer in Ay');
@@ -163,7 +163,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     ylabel({'$\Delta F_zf$,$\Delta F_zr$ [N]'})
     legend('Front','Rear')
     title('Lateral Load Transfer in Ay')
-%     exportgraphics(f,'Graphs/LateralLoadTransfAy.eps')
+    exportgraphics(f,'Graphs/LateralLoadTransfAy.eps')
     hold off
     % --------------------------
     %% Normalized Axle Characteristics
@@ -171,16 +171,10 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % Side Slip Angles
     alpha_f = 0.5.*deg2rad(alpha_fr + alpha_fl); % Simulated
     alpha_r = 0.5.*deg2rad(alpha_rr + alpha_rl); 
-    alpha_f_n = delta_use - beta - rho_ss.*Lf; % theoretical
+
+    alpha_f_n = delta_use - beta - rho_ss.*Lf; % Analytical
     alpha_r_n = -beta + rho_ss.*Lr;
     Dalpha = alpha_r - alpha_f;
-
-    % Check if they match
-%     figure,hold on;
-%     plot(alpha_f(3000:end),'b--')
-%     plot(alpha_r(3000:end),'r--')
-%     plot(alpha_f_n(3000:end),'c-.')
-%     plot(alpha_r_n(3000:end),'r:')
 
     % Axle Normal Loads
     Fz_f = Fz_fl + Fz_fr;
@@ -204,8 +198,12 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     mu_f = Y_f./Fz_f;
     mu_r = Y_r./Fz_r;
 
-    % Plots
-     % Axle Characteristics
+    % Normalized Cornering Stiffnesses
+    Cy_f = gradient(mu_f);
+    Cy_r = gradient(mu_r);
+
+    % PLOTS
+    % Axle Characteristics
     f = figure('Name','Axle Characteristics');
     tiledlayout(2,2)
 
@@ -240,90 +238,91 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     exportgraphics(f,'Graphs/AxleChar.eps')
 
     % Theoretical Axle Characteristics
-%     figure, hold on;
-%     plot(linspace(0,max(alpha_f),length(alpha_f)),Fy_f_t,'b--')
-%     plot(linspace(0,max(alpha_r),length(alpha_r)),Fy_r_t,'r--')
-%     xlabel('$\alpha [rad]$')
-%     ylabel({'$Fy_f$,$Fy_r$'})
-%     legend('$Fy_f$','$Fy_r$','Location','best')
-%     hold off
-
-     % Normalized Axle Characteristics
-%     f = figure('Name','Axle Characteristics');
-%     tiledlayout(2,2)
-%     nexttile
-%     hold on
-%     plot(alpha_f,Y_f,'b')
-%     plot(alpha_f,Fy_f,'-.','Color',[0 0.4470 0.7410])
-%     xlabel('$\alpha_f [rad]$')
-%     ylabel({'$Y_f$,$Fy_f$'})
-%     legend('Yf','$Fy_f$','Location','best')
-%     title('Axle Characteristics Front')
-%     hold off
-% 
-%     nexttile
-%     hold on
-%     plot(alpha_r,Y_r,'r')
-%     plot(alpha_r,Fy_r,'-.','Color',[0.957 0.263 0.212])
-%     xlabel('$\alpha_r [rad]$')
-%     ylabel({'$Y_r$,$Fy_r$'})
-%     legend('Yr','$Fy_r$','Location','best')
-%     title('Axle Characteristics Rear')
-%     hold off
-% 
-%     nexttile([1,2])
-%     hold on
-%     plot(linspace(0,0.004,length(mu_f)),mu_f,'b')
-%     plot(linspace(0,0.004,length(mu_r)),mu_r,'r')
-%     xlabel('$\alpha [rad]$')
-%     ylabel({'$\mu_f$,$\mu_r$'})
-%     title('Normalized Axle Characteristics')
-%     exportgraphics(f,'Graphs/NormAxleChar.eps')
+    f = figure('Name','Normalized Axle Characteristics');
+    hold on
+    plot(alpha_f,mu_f,'b')
+    plot(alpha_r,mu_r,'r')
+    xlabel('$\alpha_f , \alpha_r [rad]$')
+    ylabel({'$\mu_f$,$\mu_r$'})
+    title('Normalized Axle Characteristics')
+    legend('$front$','$rear$','Location','best')
+    hold off
+    exportgraphics(f,'Graphs/NormAxleChar.eps')
 
     % --------------------------------
     %% Handling Diagram
     % --------------------
     % Steering Characteristics
-    idx = Dalpha>6.2*1e-4;
-    Dalpha_aux = -Dalpha(idx); % prestidigitazione
+    % ->  rho_ss*L-delta_f = alpha_r-alpha_f
+    % ->  delta_Ack = rho_ss*L/tau_H   (when Dalpha=0)
 
-    figure('Name','Handling Diagram')
+    idx = Dalpha>6.2*1e-4;
+    Ay_ss_aux = Ay_ss(idx); % cut
+    Dalpha_aux = -Dalpha(idx); % cut
+
+    % Interpolate tangent
+    x_aux = [0,Ay_ss_aux(1)];
+    y_aux = [0,Dalpha_aux(1)];
+    p = polyfit(x_aux,y_aux,1);
+    linetg = polyval(p,fake_Ay);
+
+    f = figure('Name','Steering Characteristics');
+    tiledlayout(2,2)
+
+    nexttile([1,2])
     hold on
-    plot(Ay_ss(idx)/g,Dalpha_aux,'r')
-    yline(0,'g')
+    plot(Ay_ss_aux./g,Dalpha_aux,'r','LineWidth',1.5)
+    plot(fake_Ay./g,linetg,'b--')
+    yline(0,'g','LineWidth',1)
+    xlim([0,0.9])
     ylim('padded')
     xlabel('$\frac{a_y}{g}$')
     ylabel('$\Delta\alpha$')
-    legend('$\Delta\alpha$','$\rho_0 L/-\delta$','Location','best')
+%     legend('$\Delta\alpha$','$\rho_0 L-\delta$','Location','best')
     title('Handling Diagram')
     hold off
     
+
     % Curvature
-    figure('Name','Curvature')
-    plot(Ay_ss(idx)/g,rho_ss(idx))
+    nexttile(3)
+    plot(Ay_ss_aux/g,rho_ss(idx))
     yline(mean(delta_use)/L,'g')
-    xlabel('$\frac{a_y}{g} []$')
+    xlabel('$\frac{a_y}{g}$')
     ylabel('$\rho [1/m]$')
     ylim('padded')
     title('Curvature')
  
     % Radius
-    figure('Name','Radius')
-    plot(Ay_ss(idx)/g,1./rho_ss(idx))
-    yline(mean(delta_use)/L,'g')
-    xlabel('$\frac{a_y}{g} []$')
+    nexttile(4)
+    plot(Ay_ss_aux/g,1./rho_ss(idx))
+    yline(L/mean(delta_use),'g')
+    xlabel('$\frac{a_y}{g}$')
     ylabel('$R [m]$')
     ylim('padded')
     title('Radius')
 
+    % Steering
+%     nexttile
+%     plot(Ay_ss_aux/g,delta_use(idx))
+%     hold on
+%     plot(Ay_ss_aux/g,rho_ss(idx)*L/tau_D,'g')
+%     xlabel('$\frac{a_y}{g} [ ]$')
+%     ylabel('$\delta [rad]$')
+%     ylim('padded')
+%     title('Steering')
+%     hold off
+    
+    exportgraphics(f,'Graphs/SteeringChar.eps')
     % --------------------
     %% Understeering Gradient
     % Compare theoretical and fitted Kus
     % --------------------------------
     % Theoretical
+    Kus = m/(L^2)*(/+/)
 
     % Fitted
-
+    % p(1) is the slope of the tangent we computed in the handling
+    % characteristics
     % --------------------------------
     %% Yaw Rate Gain
     % slide99----------------------------
