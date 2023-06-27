@@ -323,32 +323,32 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     %% Understeering Gradient
     % Compare theoretical and fitted Kus
     % --------------------------------
-%     global flg;
-%    
-%     switch flg
-%         case flg == 2
-% 
-%             % Theoretical
-%             Kus = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
-%             % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
-%             % -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
-% 
-%             % Fitted
-%             Kus_fit = gradient(delta_use(idx));
-% 
-%             % Plot
-%             f = figure('Name','Understeering Gradient');
-%             hold on
-%             plot(fake_Ay,Kus.*fake_Ay)
-%             plot(fake_Ay,mean(Kus_fit(1:10)).*fake_Ay)
-%             hold off
-%             exportgraphics(f,'Graphs/UndersteeringGrad.eps')
-% 
-%             % p(1) is the slope of the tangent we computed in the handling
-%             % characteristics
-%         otherwise
-%             
-%     end
+    global flg;
+   
+    switch flg
+        case flg == 2
+
+            % Theoretical
+            Kus = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
+            % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
+            % -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
+
+            % Fitted
+            Kus_fit = gradient(delta_use(idx));
+
+            % Plot
+            f = figure('Name','Understeering Gradient');
+            hold on
+            plot(fake_Ay,Kus.*fake_Ay)
+            plot(fake_Ay,mean(Kus_fit(1:10)).*fake_Ay)
+            hold off
+            exportgraphics(f,'Graphs/UndersteeringGrad.eps')
+
+            % p(1) is the slope of the tangent we computed in the handling
+            % characteristics
+        otherwise
+            
+    end
 
     % --------------------------------
     %% Yaw Rate Gain
@@ -378,7 +378,7 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     plot(u(idx),beta_neutral(idx),'g')
     xlabel('$u [m/s]$')
     ylabel('$\frac{\beta}{\delta}$')
-%     legend('Vehicle','Neutral')
+    legend('Vehicle','Neutral')
     title('Body Slip Gain')
     hold off
     exportgraphics(f,'Graphs/bodyslipgain.eps')

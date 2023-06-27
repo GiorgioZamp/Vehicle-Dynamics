@@ -70,7 +70,7 @@ vehicle_data = getVehicleDataStruct();
     % Post-Processing
     % ----------------------------
     dataAnalysis(model_sim,vehicle_data,Ts);
-%     vehicleAnimation(model_sim,vehicle_data,Ts); %Clothoids Toolbox
+    vehicleAnimation(model_sim,vehicle_data,Ts); % needs Clothoids Toolbox
     handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
     % ----------------------------
 
@@ -114,4 +114,5 @@ vehicle_data = getVehicleDataStruct();
 %     % ----------------------------
 %     dataAnalysis(model_sim,vehicle_data,Ts);
 %     vehicleAnimation(model_sim,vehicle_data,Ts);
+%     handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
 %     % ----------------------------
