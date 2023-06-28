@@ -83,8 +83,11 @@ vehicle_data = getVehicleDataStruct();
     toe_effect(toe_set,vehicle_data)
 
     % Roll Stiffness Effect
-    % roll_set; % Stiffnesses to try
-    % rollstiff_effect(roll_set,vehicle_data)
+	% Vary Roll Stiffnesses front-rear distribution
+	% e_phi->1 all to the front
+	% e_phi->0 all to the back
+    % e_phi_set = 0.2:0.2:0.8;
+    % rollstiff_effect(e_phi_set,vehicle_data)
 
     % ----------------------------
 %% STEER RAMP TEST
