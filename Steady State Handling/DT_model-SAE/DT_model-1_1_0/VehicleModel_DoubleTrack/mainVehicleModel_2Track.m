@@ -32,7 +32,6 @@ vehicle_data = getVehicleDataStruct();
 % ----------------------------
 %% SPEED RAMP TEST
     % ----------------------------
-    global flg;
     flg = 1; % flag for simulation profile selection
     
     % P=0.0436462066049939 I=0.0175035310088279 D=-0.00909870879334459 N=2
@@ -70,10 +69,24 @@ vehicle_data = getVehicleDataStruct();
     % Post-Processing
     % ----------------------------
     dataAnalysis(model_sim,vehicle_data,Ts);
-    vehicleAnimation(model_sim,vehicle_data,Ts); % needs Clothoids Toolbox
-    handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
-    % ----------------------------
+    handling_diagram(model_sim,vehicle_data,Ts);
+    % vehicleAnimation(model_sim,vehicle_data,Ts); % needs Clothoids Toolbox
 
+    %% Test camber, toe angle and roll stiffness effects
+   
+    % Camber Effect
+    camber_set = -10:2:+10; % [deg] camber angle
+    camber_effect(camber_set,vehicle_data)
+
+    % Toe Effect
+    toe_set = -3:1:+3; % [deg] toe angle
+    toe_effect(toe_set,vehicle_data)
+
+    % Roll Stiffness Effect
+    % roll_set; % Stiffnesses to try
+    % rollstiff_effect(roll_set,vehicle_data)
+
+    % ----------------------------
 %% STEER RAMP TEST
 % ----------------------------
 %       flg = 2; % flag for simulation profile selection
@@ -113,6 +126,9 @@ vehicle_data = getVehicleDataStruct();
 %     % Post-Processing
 %     % ----------------------------
 %     dataAnalysis(model_sim,vehicle_data,Ts);
-%     vehicleAnimation(model_sim,vehicle_data,Ts);
+
 %     handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
+
+%     vehicleAnimation(model_sim,vehicle_data,Ts);
+
 %     % ----------------------------
