@@ -1,7 +1,7 @@
 %% Handling Diagram
 % Function to compute all the characteristics requested in the assignment
 
-function handling_diagram(model_sim,vehicle_data,Ts)
+function handling_diagram(model_sim,vehicle_data)
     %% Auxiliary
     % ---------------------------------
     cc = jet(20); % color set
@@ -315,8 +315,8 @@ function handling_diagram(model_sim,vehicle_data,Ts)
     % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
     % -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 
-    disp('$K_{us} = $',num2str(Kus))
-    disp('$K_{US} = $',num2str(p(1)))
+    disp(['Kus = ',num2str(Kus)])
+    disp(['KUS = ',num2str(p(1))])
 
     % Fitted
     % Kus_fit = gradient(delta_use(idx));

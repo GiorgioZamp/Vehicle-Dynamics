@@ -69,7 +69,7 @@ vehicle_data = getVehicleDataStruct();
     % Post-Processing
     % ----------------------------
     dataAnalysis(model_sim,vehicle_data,Ts);
-    handling_diagram(model_sim,vehicle_data,Ts);
+    handling_diagram(model_sim,vehicle_data);
     % vehicleAnimation(model_sim,vehicle_data,Ts); % needs Clothoids Toolbox
 
     %% Test camber, toe angle and roll stiffness effects
@@ -86,8 +86,8 @@ vehicle_data = getVehicleDataStruct();
 	% Vary Roll Stiffnesses front-rear distribution
 	% e_phi->1 all to the front
 	% e_phi->0 all to the back
-    % e_phi_set = 0.2:0.2:0.8;
-    % rollstiff_effect(e_phi_set,vehicle_data)
+    e_phi_set = [0.2,0.5,0.8];
+    rollstiff_effect(e_phi_set,vehicle_data)
 
     % ----------------------------
 %% STEER RAMP TEST
