@@ -155,6 +155,9 @@ function handling_diagram(model_sim,vehicle_data)
     % --------------------------
     %% Normalized Axle Characteristics
     % --------------------------------
+    idx = time_sim>5;
+    
+
     % Side Slip Angles
     alpha_f = 0.5.*deg2rad(alpha_fr + alpha_fl); % Simulated
     alpha_r = 0.5.*deg2rad(alpha_rr + alpha_rl); 
@@ -185,7 +188,7 @@ function handling_diagram(model_sim,vehicle_data)
     mu_f = Y_f./Fz_f;
     mu_r = Y_r./Fz_r;
 
-    % Normalized Cornering Stiffnesses
+    % Normalized Cornering Stiffnesses  -> they are close to zero
     Cy_f = gradient(mu_f);
     Cy_r = gradient(mu_r);
 
@@ -227,8 +230,8 @@ function handling_diagram(model_sim,vehicle_data)
     % Theoretical Axle Characteristics
     f = figure('Name','Normalized Axle Characteristics');
     hold on
-    plot(alpha_f,mu_f,'b')
-    plot(alpha_r,mu_r,'r')
+    plot(alpha_f(idx),mu_f(idx),'b')
+    plot(alpha_r(idx),mu_r(idx),'r')
     xlabel('$\alpha_f , \alpha_r [rad]$')
     ylabel({'$\mu_f$,$\mu_r$'})
     title('Normalized Axle Characteristics')
@@ -251,7 +254,9 @@ function handling_diagram(model_sim,vehicle_data)
     x_aux = [0,Ay_ss_aux(1)];
     y_aux = [0,Dalpha_aux(1)];
     p = polyfit(x_aux,y_aux,1);
+    p2 = polyfit([Ay_ss_aux(1),Ay_ss_aux(10000)],[Dalpha_aux(1),Dalpha_aux(10000)],1);
     linetg = polyval(p,fake_Ay);
+    linetg2 = polyval(p2,fake_Ay);
 
     f = figure('Name','Steering Characteristics');
     tiledlayout(2,2)
@@ -260,6 +265,7 @@ function handling_diagram(model_sim,vehicle_data)
     hold on
     plot(Ay_ss_aux./g,Dalpha_aux,'r','LineWidth',1.5)
     plot(fake_Ay./g,linetg,'b--')
+    plot(fake_Ay./g,linetg2,'c--')
     yline(0,'g','LineWidth',1)
     xlim([0,0.9])
     ylim('padded')
@@ -311,16 +317,17 @@ function handling_diagram(model_sim,vehicle_data)
     % --------------------------------
 
     % Theoretical
-    Kus = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
+    Kus_a = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
     % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
-    % -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
+    % Kus_b = -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 
-    disp(['Kus = ',num2str(Kus)])
-    disp(['KUS = ',num2str(p(1))])
+    disp(['Computed Understeering Gradient','Kus_a = ',num2str(Kus_a)])
+    % disp(['Computed Understeering Gradient','Kus_b = ',num2str(Kus_b)])
+    disp(['From Handling Diagram','KUS = ',num2str(p2(1))])
 
     % Fitted
     % Kus_fit = gradient(delta_use(idx));
-    % 
+    
     % % Plot
     % f = figure('Name','Understeering Gradient');
     % hold on

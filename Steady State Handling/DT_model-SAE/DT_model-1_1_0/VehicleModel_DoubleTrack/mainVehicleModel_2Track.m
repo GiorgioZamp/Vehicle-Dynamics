@@ -34,7 +34,6 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     flg = 1; % flag for simulation profile selection
     
-    % P=0.0436462066049939 I=0.0175035310088279 D=-0.00909870879334459 N=2
     % ----------------------------
     % Define initial conditions for the simulation
     % ----------------------------
@@ -72,7 +71,8 @@ vehicle_data = getVehicleDataStruct();
     handling_diagram(model_sim,vehicle_data);
     % vehicleAnimation(model_sim,vehicle_data,Ts); % needs Clothoids Toolbox
 
-    %% Test camber, toe angle and roll stiffness effects
+% ----------------------------
+%% Camber, Toe Angle and Roll Stiffness Effects
    
     % Camber Effect
     camber_set = -10:2:+10; % [deg] camber angle
@@ -83,7 +83,7 @@ vehicle_data = getVehicleDataStruct();
     toe_effect(toe_set,vehicle_data)
 
     % Roll Stiffness Effect
-	% Vary Roll Stiffnesses front-rear distribution
+	% Vary Roll Stiffnesses ratio
 	% e_phi->1 all to the front
 	% e_phi->0 all to the back
     e_phi_set = [0.2,0.5,0.8];
