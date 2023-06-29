@@ -2,12 +2,12 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
 
  %% Load vehicle data
     % ---------------------------------
-    % Lf = vehicle_data.vehicle.Lf;  % [m] Distance between vehicle CoG and front wheels axle
-    % Lr = vehicle_data.vehicle.Lr;  % [m] Distance between vehicle CoG and front wheels axle
-    % L  = vehicle_data.vehicle.L;   % [m] Vehicle length
+    Lf = vehicle_data.vehicle.Lf;  % [m] Distance between vehicle CoG and front wheels axle
+    Lr = vehicle_data.vehicle.Lr;  % [m] Distance between vehicle CoG and front wheels axle
+    L  = vehicle_data.vehicle.L;   % [m] Vehicle length
     % Wf = vehicle_data.vehicle.Wf;  % [m] Width of front wheels axle 
     % Wr = vehicle_data.vehicle.Wr;  % [m] Width of rear wheels axle                   
-    % m  = vehicle_data.vehicle.m;   % [kg] Vehicle Mass
+    m  = vehicle_data.vehicle.m;   % [kg] Vehicle Mass
     % m_s = 225;                     % [kg] Sprung Mass (Not present in struct)
     g  = vehicle_data.vehicle.g;   % [m/s^2] Gravitational acceleration
     % tau_D = vehicle_data.steering_system.tau_D;  % [-] steering system ratio (pinion-rack)
@@ -41,10 +41,10 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     u          = model_sim.states.u.data;
     % v          = model_sim.states.v.data;
     Omega      = model_sim.states.Omega.data;
-    % Fz_rr      = model_sim.states.Fz_rr.data;
-    % Fz_rl      = model_sim.states.Fz_rl.data;
-    % Fz_fr      = model_sim.states.Fz_fr.data;
-    % Fz_fl      = model_sim.states.Fz_fl.data;
+    Fz_rr      = model_sim.states.Fz_rr.data;
+    Fz_rl      = model_sim.states.Fz_rl.data;
+    Fz_fr      = model_sim.states.Fz_fr.data;
+    Fz_fl      = model_sim.states.Fz_fl.data;
     % delta      = model_sim.states.delta.data;
 
     alpha_rr   = model_sim.states.alpha_rr.data;
@@ -56,10 +56,10 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     % Extra Parameters
     % -----------------
  
-    % Fy_rr      = model_sim.extra_params.Fy_rr.data;
-    % Fy_rl      = model_sim.extra_params.Fy_rl.data;
-    % Fy_fr      = model_sim.extra_params.Fy_fr.data;
-    % Fy_fl      = model_sim.extra_params.Fy_fl.data;
+    Fy_rr      = model_sim.extra_params.Fy_rr.data;
+    Fy_rl      = model_sim.extra_params.Fy_rl.data;
+    Fy_fr      = model_sim.extra_params.Fy_fr.data;
+    Fy_fl      = model_sim.extra_params.Fy_fl.data;
 
     % delta_fr   = model_sim.extra_params.delta_fr.data;
     % delta_fl   = model_sim.extra_params.delta_fl.data;
@@ -88,6 +88,19 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     % ---------------------------------
     %% Handling Diagram
     % --------------------
+
+    % Lateral Load Transfer
+    dFz_f = 0.5.*abs(Fz_fr-Fz_fl);
+    dFz_r = 0.5.*abs(Fz_rr-Fz_rl);
+
+    % Lateral Forces
+    % Fy_f = Fy_fr + Fy_fl;
+    % Fy_r = Fy_rr + Fy_rl;
+
+    % Axle Characteristics
+    % Y_f = m*Ay_ss_aux*Lr/L;
+    % Y_r = m*Ay_ss_aux*Lf/L;
+
     % Side Slip Angles
     alpha_f = 0.5.*deg2rad(alpha_fr + alpha_fl); % Simulated
     alpha_r = 0.5.*deg2rad(alpha_rr + alpha_rl);
@@ -98,9 +111,14 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     idx = aux>0;
     clear aux % cover my crimes
 
+    % Cuts
     Ay_ss_aux = Ay_ss(idx);
     fake_Ay = linspace(0,max(Ay_ss_aux),length(Ay_ss_aux))';
     Dalpha_aux = -Dalpha(idx);
+    % Fy_f = Fy_f(idx);
+    % Fy_r = Fy_r(idx);
+    dFz_f = dFz_f(idx);
+    dFz_r = dFz_r(idx);
 
     % Interpolate tangent
     x_aux = [0,Ay_ss_aux(1)];
@@ -108,8 +126,10 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     p = polyfit(x_aux,y_aux,1);
     linetg = polyval(p,fake_Ay);
 
-    handling_data.Ay_n = Ay_ss_aux/g;
+    handling_data.Ay_n = Ay_ss_aux;
     handling_data.Dalpha = Dalpha_aux;
-    handling_data.tg = linetg;
+    handling_data.dFz_f = dFz_f;
+    handling_data.dFz_r = dFz_r;
+    % handling_data.tg = linetg;
 
 end
