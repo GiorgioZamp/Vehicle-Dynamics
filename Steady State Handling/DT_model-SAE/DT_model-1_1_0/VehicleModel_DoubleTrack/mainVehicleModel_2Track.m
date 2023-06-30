@@ -92,46 +92,46 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
 %% STEER RAMP TEST
 % ----------------------------
-%       flg = 2; % flag for simulation profile selection
+      flg = 2; % flag for simulation profile selection
 
-%     % Define initial conditions for the simulation
-%     % ----------------------------
-%     V0 = 50/3.6; % Initial speed
-%     X0 = loadInitialConditions(V0);
-%     
-%     
-%     % ----------------------------
-%     % Define the desired steer
-%     % ----------------------------
-%     V_des = 50/3.6; % Desired speed for controller
-%     steer_des = 10;     % [°] desired steer angle
-%     slope = 0.1;    % Slope of steer ramp
-%     
-%     % ----------------------------
-%     % Simulation parameters
-%     % ----------------------------
-%     simulationPars = getSimulationParams(); 
-%     Ts = simulationPars.times.step_size;  % integration step for the simulation (fixed step)
-%     T0 = simulationPars.times.t0;         % starting time of the simulation
-%     Tf = simulationPars.times.tf;         % stop time of the simulation
-%     
-%     % ----------------------------
-%     % Start Simulation
-%     % ----------------------------
-%     fprintf('Starting Simulation\n')
-%     tic;
-%     model_sim = sim('Vehicle_Model_2Track_OLD');
-%     elapsed_time_simulation = toc;
-%     fprintf('Simulation completed\n')
-%     fprintf('The total simulation time was %.2f seconds\n',elapsed_time_simulation)
-%     
-%     % ----------------------------
-%     % Post-Processing
-%     % ----------------------------
-%     dataAnalysis(model_sim,vehicle_data,Ts);
+    % Define initial conditions for the simulation
+    % ----------------------------
+    V0 = 50/3.6; % Initial speed
+    X0 = loadInitialConditions(V0);
 
-%     handling_diagram(model_sim,vehicle_data,Ts); % MY FUNCTION
+    % ----------------------------
+    % Define the desired steer
+    % ----------------------------
+    V_des = 50/3.6; % Desired speed for controller
+    steer_des = 0;     % [°] desired steer angle
+    slope = 0.5;    % Slope of steer ramp
 
-%     vehicleAnimation(model_sim,vehicle_data,Ts);
+    % ----------------------------
+    % Simulation parameters
+    % ----------------------------
+    simulationPars = getSimulationParams(); 
+    Ts = simulationPars.times.step_size;  % integration step for the simulation (fixed step)
+    T0 = simulationPars.times.t0;         % starting time of the simulation
+    Tf = simulationPars.times.tf;         % stop time of the simulation
 
-%     % ----------------------------
+    % ----------------------------
+    % Start Simulation
+    % ----------------------------
+    fprintf('Starting Simulation\n')
+    tic;
+    model_sim = sim('Vehicle_Model_2Track_OLD');
+    elapsed_time_simulation = toc;
+    fprintf('Simulation completed\n')
+    fprintf('The total simulation time was %.2f seconds\n',elapsed_time_simulation)
+
+    % ----------------------------
+    % Post-Processing
+    % ----------------------------
+    cut_time = 20; %[s]
+    dataAnalysisSteerCut(model_sim,vehicle_data,Ts,cut_time);
+
+    handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time); % MY FUNCTION
+
+    % vehicleAnimation(model_sim,vehicle_data,Ts);
+
+    % ----------------------------
