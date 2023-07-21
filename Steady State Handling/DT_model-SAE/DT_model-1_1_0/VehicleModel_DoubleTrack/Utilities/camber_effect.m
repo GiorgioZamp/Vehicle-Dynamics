@@ -1,45 +1,45 @@
-function camber_effect(camber_set,vehicle_data)    
-%% Camber Effect
+function camber_effect(camber_set,vehicle_data)
+% Camber Effect
 
-    % For camber test no toe used
-    vehicle_data.steering_system.delta__0 = 0;
+% For camber test no toe used
+vehicle_data.steering_system.delta__0 = 0;
 
-    leg = cell(size(camber_set)); %initialize for speed
-    datasets = cell(size(camber_set));
-   
-    for i=1:length(camber_set)
+leg = cell(size(camber_set)); %initialize for speed
+datasets = cell(size(camber_set));
 
-        % Set parameters
-        vehicle_data.front_wheel.static_camber = camber_set(i);
-        vehicle_data.rear_wheel.static_camber = camber_set(i);
+for i=1:length(camber_set)
 
-        % Simulate
-        model_sim = sim('Vehicle_Model_2Track_OLD');
+    % Set parameters
+    vehicle_data.front_wheel.static_camber = camber_set(i);
+    vehicle_data.rear_wheel.static_camber = camber_set(i);
 
-        % Extract data
-        [handling_data] = extract_handling(model_sim,vehicle_data);
+    % Simulate
+    model_sim = sim('Vehicle_Model_2Track_OLD');
 
-        % Store the dataset in the structure
-        datasets{i} = handling_data;
+    % Extract data
+    [handling_data] = extract_handling(model_sim,vehicle_data);
 
-        % Show progress
-        fprintf('Simulation %d/%d Completed\n',i,length(camber_set))
-        
-    end
+    % Store the dataset in the structure
+    datasets{i} = handling_data;
 
-    % Plot
-    cc = jet(length(camber_set));
+    % Show progress
+    fprintf('Simulation %d/%d Completed\n',i,length(camber_set))
 
-    f = figure('Name','Camber Effect');
-    hold on
-    for i = 1:length(camber_set)
-        plot(datasets{1,i}.Ay_n(20000:end), -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
-        leg{i} = ['$\gamma$ ',num2str(camber_set(i))];
-    end
-    xlabel('$\frac{a_y}{g}$')
-    ylabel('$-\Delta\alpha$')
-    legend(leg)
-    title('Handling Diagram in $\gamma$')
-    exportgraphics(f,'Graphs/CamberEffect.eps')
+end
+
+% Plot
+cc = jet(length(camber_set));
+f = figure('Name','Camber Effect');
+hold on;
+for i = 1:length(camber_set)
+    plot(datasets{1,i}.Ay_n(20000:end)/9.81, -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
+    leg{i} = ['$\gamma\;$',num2str(camber_set(i))];
+end
+xlabel('$\frac{a_y}{g}$')
+ylabel('$-\Delta\alpha$')
+legend(leg)
+title('Handling Diagram in $\gamma$')
+exportgraphics(f,'Graphs/CamberEffect.eps');
+hold off
 
 end

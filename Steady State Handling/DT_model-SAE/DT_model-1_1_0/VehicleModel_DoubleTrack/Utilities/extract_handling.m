@@ -114,7 +114,7 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     % Cuts
     Ay_ss_aux = Ay_ss(idx);
     fake_Ay = linspace(0,max(Ay_ss_aux),length(Ay_ss_aux))';
-    Dalpha_aux = -Dalpha(idx);
+    Dalpha_aux = Dalpha(idx);
     % Fy_f = Fy_f(idx);
     % Fy_r = Fy_r(idx);
     dFz_f = dFz_f(idx);

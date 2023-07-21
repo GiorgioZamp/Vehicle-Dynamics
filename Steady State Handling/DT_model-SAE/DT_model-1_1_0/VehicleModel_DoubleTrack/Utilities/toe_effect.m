@@ -32,6 +32,7 @@ function toe_effect(toe_set,vehicle_data)
         plot(datasets{1,i}.Ay_n(20000:end), -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
         leg{i} = ['$\delta_0$ ',num2str(toe_set(i))];
     end
+    hold off
     xlabel('$\frac{a_y}{g}$')
     ylabel('$-\Delta\alpha$')
     legend(leg)

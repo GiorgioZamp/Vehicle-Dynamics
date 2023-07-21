@@ -321,9 +321,9 @@ function handling_diagram(model_sim,vehicle_data)
     % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
     % Kus_b = -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 
-    disp(['Computed Understeering Gradient','Kus_a = ',num2str(Kus_a)])
+    disp(['Computed Understeering Gradient ','Kus_a = ',num2str(Kus_a)])
     % disp(['Computed Understeering Gradient','Kus_b = ',num2str(Kus_b)])
-    disp(['From Handling Diagram','KUS = ',num2str(p2(1))])
+    disp(['From Handling Diagram ','KUS = ',num2str(p2(1))])
 
     % Fitted
     % Kus_fit = gradient(delta_use(idx));

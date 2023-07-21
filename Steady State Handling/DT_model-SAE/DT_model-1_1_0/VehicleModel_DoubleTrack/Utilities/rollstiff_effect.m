@@ -5,15 +5,17 @@ function rollstiff_effect(e_phi,vehicle_data)
 leg = cell(size(e_phi)); %initialize for speed
 datasets = cell(size(e_phi));
 
+% get total stiff.
+K_sf = vehicle_data.front_suspension.Ks_f;
+K_sr = vehicle_data.rear_suspension.Ks_r;
+K_tot = K_sf+K_sr;
+
 for i=1:length(e_phi)
     
     % Set parameters
-    % get total stiff.
-    K_sf = vehicle_data.front_suspension.Ks_f;
-    K_sr = vehicle_data.rear_suspension.Ks_r;
-    % get new axle stiff.
-    vehicle_data.front_suspension.Ks_f = e_phi(i)*(K_sf+K_sr); % [N/m] Front suspension+tire stiffness
-    vehicle_data.rear_suspension.Ks_r  = (1-e_phi(i))*(K_sf+K_sr); % [N/m] Rear suspension+tire stiffness
+    % Get new axle stiffnesses
+    vehicle_data.front_suspension.Ks_f = e_phi(i)*(K_tot); % [N/m] Front suspension+tire stiffness
+    vehicle_data.rear_suspension.Ks_r  = (1-e_phi(i))*(K_tot); % [N/m] Rear suspension+tire stiffness
 
     % Simulate
     model_sim = sim('Vehicle_Model_2Track_OLD');
@@ -32,16 +34,16 @@ end
 %------------------------------------------------------------------------
 
 % Plots
-cc = jet(length(e_phi));
-%------------------------------------------------------------------------
+cc = winter(length(e_phi));
 
 % Handling Diagram
 f = figure('Name','Roll Stiffness Effect');
 hold on
 for i = 1:length(e_phi)
-    plot(datasets{1,i}.Ay_n(20000:end)./9.81, -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
-    leg{i} = ['$\epsilon_{\phi}$',num2str(e_phi(i))];
+    plot(datasets{1,i}.Ay_n(20000:end)/9.81, -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
+    leg{i} = ['$\epsilon_{\phi}\;$',num2str(e_phi(i))];
 end
+hold off
 xlabel('$\frac{a_y}{g}$')
 ylabel('$-\Delta\alpha$')
 legend(leg)
@@ -50,26 +52,20 @@ exportgraphics(f,'Graphs/RollStiffEffect.eps')
 %------------------------------------------------------------------------
 
 % Lateral Forces
-figure('Name','Lateral Load Transfer');
-subplot(1,2,1)
-hold on
-for i = 1:length(e_phi)
-    plot(datasets{1,i}.Ay_n(20000:end), datasets{1,i}.dFz_f(20000:end),'b')
-end
-xlabel('$a_y$')
-ylabel('$dFz_f$')
-title('Lateral Load Transfer Front')
-hold off
-
-subplot(1,2,2)
-hold on
-for i = 1:length(e_phi)
-    plot(datasets{1,i}.Ay_n(20000:end), datasets{1,i}.dFz_r(20000:end),'r')
-end
-xlabel('$a_y$')
-ylabel('$dFz_r$')
-title('Lateral Load Transfer Rear')
-hold off
+% figure('Name','Lateral Load Transfer');
+% hold on
+% cc = generateColorSetLight(length(e_phi));
+% for i = 1:length(e_phi)
+%     plot(datasets{i}.Ay_n(20000:end), datasets{i}.dFz_f(20000:end),'Color',cc(i,:))
+% end
+% cc = generateColorSetLight(length(e_phi),[1,0,0]);
+% for i = 1:length(e_phi)
+%     plot(datasets{i}.Ay_n(20000:end), datasets{i}.dFz_r(20000:end),'Color',cc(i,:))
+% end
+% xlabel('$a_y$')
+% ylabel('$dFz_f$')
+% title('Lateral Load Transfer Front')
+% hold off
 %------------------------------------------------------------------------
 
 end

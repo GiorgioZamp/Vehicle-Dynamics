@@ -43,8 +43,8 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     % Define the desired speed
     % ----------------------------
-    V_des = 50/3.6; % Desired speed for controller (kept for ease)
-    slope = 0.5;    % Slope of speed ramp +1 m/s each 10 s [m/s^2]
+    V_des = 30/3.6; % Desired speed for controller (kept for ease)
+    slope = 0.25;    % Slope of speed ramp [m/s^2]
 
     % ----------------------------
     % Simulation parameters
@@ -55,7 +55,7 @@ vehicle_data = getVehicleDataStruct();
     Tf = simulationPars.times.tf;         % stop time of the simulation
     
     % ----------------------------
-    % Start Simulation
+    %% Start Simulation
     % ----------------------------
     fprintf('Starting Simulation\n')
     tic;
@@ -68,26 +68,25 @@ vehicle_data = getVehicleDataStruct();
     % Post-Processing
     % ----------------------------
     dataAnalysis(model_sim,vehicle_data,Ts);
-    handling_diagram(model_sim,vehicle_data);
+    handling_diagram(model_sim,vehicle_data); %fix understeering gradient
     % vehicleAnimation(model_sim,vehicle_data,Ts); % needs Clothoids Toolbox
 
 % ----------------------------
 %% Camber, Toe Angle and Roll Stiffness Effects
-   
-    % Camber Effect
+    %% Camber Effect
     camber_set = -10:2:+10; % [deg] camber angle
     camber_effect(camber_set,vehicle_data)
 
-    % Toe Effect
+    %% Toe Effect
     toe_set = -3:1:+3; % [deg] toe angle
     toe_effect(toe_set,vehicle_data)
 
-    % Roll Stiffness Effect
+    %% Roll Stiffness Effect
 	% Vary Roll Stiffnesses ratio
 	% e_phi->1 all to the front
 	% e_phi->0 all to the back
-    e_phi_set = [0.2,0.5,0.8];
-    rollstiff_effect(e_phi_set,vehicle_data)
+    e_phi = [0.2,0.3,0.4,0.6,0.7,0.8]; % default was 0.44
+    rollstiff_effect(e_phi,vehicle_data)
 
     % ----------------------------
 %% STEER RAMP TEST
