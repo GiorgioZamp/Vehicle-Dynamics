@@ -95,7 +95,7 @@ vehicle_data = getVehicleDataStruct();
 
     % Define initial conditions for the simulation
     % ----------------------------
-    V0 = 50/3.6; % Initial speed
+    V0 = 0/3.6; % Initial speed
     X0 = loadInitialConditions(V0);
 
     % ----------------------------
@@ -134,3 +134,18 @@ vehicle_data = getVehicleDataStruct();
     % vehicleAnimation(model_sim,vehicle_data,Ts);
 
     % ----------------------------
+
+    %% Camber Effect
+    camber_set = -10:2:+10; % [deg] camber angle
+    camber_effect(camber_set,vehicle_data)
+
+    %% Toe Effect
+    toe_set = -3:1:+3; % [deg] toe angle
+    toe_effect(toe_set,vehicle_data)
+
+    %% Roll Stiffness Effect
+    % Vary Roll Stiffnesses ratio
+    % e_phi->1 all to the front
+    % e_phi->0 all to the back
+    e_phi = [0.2,0.3,0.4,0.5,0.6,0.7,0.8]; % default was 0.44
+    rollstiff_effect(e_phi,vehicle_data)
