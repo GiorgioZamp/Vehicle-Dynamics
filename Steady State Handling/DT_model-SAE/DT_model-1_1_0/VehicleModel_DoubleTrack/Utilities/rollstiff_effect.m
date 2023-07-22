@@ -40,7 +40,7 @@ cc = winter(length(e_phi));
 f = figure('Name','Roll Stiffness Effect');
 hold on
 for i = 1:length(e_phi)
-    plot(datasets{1,i}.Ay_n(20000:end)/9.81, -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
+    plot(datasets{1,i}.Ay_n./9.81, -datasets{1,i}.Dalpha,'Color',cc(i,:))
     leg{i} = ['$\epsilon_{\phi}\;$',num2str(e_phi(i))];
 end
 hold off

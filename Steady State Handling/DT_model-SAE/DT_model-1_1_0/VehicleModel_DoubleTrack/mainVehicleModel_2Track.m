@@ -91,11 +91,11 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
 %% STEER RAMP TEST
 % ----------------------------
-      flg = 2; % flag for simulation profile selection
+    flg = 2; % flag for simulation profile selection
 
     % Define initial conditions for the simulation
     % ----------------------------
-    V0 = 0/3.6; % Initial speed
+    V0 = 0; % Initial speed
     X0 = loadInitialConditions(V0);
 
     % ----------------------------
@@ -136,11 +136,13 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
 
     %% Camber Effect
-    camber_set = -10:2:+10; % [deg] camber angle
+    camber_set = -4:2:+4; % [deg] camber angle
+    vehicle_data = getVehicleDataStruct();
     camber_effect(camber_set,vehicle_data)
 
     %% Toe Effect
     toe_set = -3:1:+3; % [deg] toe angle
+    vehicle_data = getVehicleDataStruct();
     toe_effect(toe_set,vehicle_data)
 
     %% Roll Stiffness Effect
@@ -148,4 +150,5 @@ vehicle_data = getVehicleDataStruct();
     % e_phi->1 all to the front
     % e_phi->0 all to the back
     e_phi = [0.2,0.3,0.4,0.5,0.6,0.7,0.8]; % default was 0.44
+    vehicle_data = getVehicleDataStruct();
     rollstiff_effect(e_phi,vehicle_data)

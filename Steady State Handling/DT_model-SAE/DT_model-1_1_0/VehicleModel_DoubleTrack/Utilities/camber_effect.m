@@ -32,14 +32,14 @@ cc = jet(length(camber_set));
 f = figure('Name','Camber Effect');
 hold on;
 for i = 1:length(camber_set)
-    plot(datasets{1,i}.Ay_n(20000:end)/9.81, -datasets{1,i}.Dalpha(20000:end),'Color',cc(i,:))
+    plot((datasets{1,i}.Ay_n)./9.81, -datasets{1,i}.Dalpha,'Color',cc(i,:))
     leg{i} = ['$\gamma\;$',num2str(camber_set(i))];
 end
 xlabel('$\frac{a_y}{g}$')
 ylabel('$-\Delta\alpha$')
 legend(leg)
 title('Handling Diagram in $\gamma$')
-exportgraphics(f,'Graphs/CamberEffect.eps');
+exportgraphics(f,'Graphs/CamberEffectSteer.eps');
 hold off
 
 end

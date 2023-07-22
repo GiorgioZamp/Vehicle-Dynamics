@@ -98,38 +98,18 @@ function [handling_data] = extract_handling(model_sim,vehicle_data)
     % Fy_r = Fy_rr + Fy_rl;
 
     % Axle Characteristics
-    % Y_f = m*Ay_ss_aux*Lr/L;
-    % Y_r = m*Ay_ss_aux*Lf/L;
+    % Y_f = m*Ay_ss*Lr/L;
+    % Y_r = m*Ay_ss*Lf/L;
 
     % Side Slip Angles
     alpha_f = 0.5.*deg2rad(alpha_fr + alpha_fl); % Simulated
     alpha_r = 0.5.*deg2rad(alpha_rr + alpha_rl);
     Dalpha = alpha_r - alpha_f;
 
-    % Cut first part
-    aux = [zeros(1,25000),ones(1,length(time_sim)-25000)]';
-    idx = aux>0;
-    clear aux % cover my crimes
-
-    % Cuts
-    Ay_ss_aux = Ay_ss(idx);
-    fake_Ay = linspace(0,max(Ay_ss_aux),length(Ay_ss_aux))';
-    Dalpha_aux = Dalpha(idx);
-    % Fy_f = Fy_f(idx);
-    % Fy_r = Fy_r(idx);
-    dFz_f = dFz_f(idx);
-    dFz_r = dFz_r(idx);
-
-    % Interpolate tangent
-    x_aux = [0,Ay_ss_aux(1)];
-    y_aux = [0,Dalpha_aux(1)];
-    p = polyfit(x_aux,y_aux,1);
-    linetg = polyval(p,fake_Ay);
-
-    handling_data.Ay_n = Ay_ss_aux;
-    handling_data.Dalpha = Dalpha_aux;
+    handling_data.Ay_n = Ay_ss;
+    handling_data.Dalpha = Dalpha;
     handling_data.dFz_f = dFz_f;
     handling_data.dFz_r = dFz_r;
-    % handling_data.tg = linetg;
+
 
 end

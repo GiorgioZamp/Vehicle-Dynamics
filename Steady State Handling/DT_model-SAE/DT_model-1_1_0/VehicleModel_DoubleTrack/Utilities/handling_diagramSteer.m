@@ -282,9 +282,6 @@ function handling_diagramSteer(model_sim,vehicle_data)
     nexttile(3)
     hold on
     plot(Ay_ss_aux(idx)/g,rho_ss(idx))
-%     temp = gradient(rho_ss(idx));
-%     tt = rho_ss(idx);
-%     plot(Ay_ss_aux/g,temp(1).*Ay_ss_aux/g+tt,'b--')
     yline(deg2rad(mean(delta_D))/(L*tau_D),'g')
     hold off
     xlabel('$\frac{a_y}{g}$')
