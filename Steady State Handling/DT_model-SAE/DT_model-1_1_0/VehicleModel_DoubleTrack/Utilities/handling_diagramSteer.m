@@ -1,10 +1,14 @@
 %% Handling Diagram
 % Function to compute all the characteristics requested in the assignment
 
-function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
+function handling_diagramSteer(model_sim,vehicle_data)
     %% Auxiliary
     % ---------------------------------
     cc = jet(20); % color set
+    %for i=1:20
+    %   yline(i,'Color',cc(i,:))
+    %   hold on
+    %end
 
     % ---------------------------------
     %% Load vehicle data
@@ -31,69 +35,66 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     %% Extract data from simulink model
     % ---------------------------------
     time_sim = model_sim.states.u.time;
-
-    index = time_sim>cut_time; %cutting from 20 to end
-    % ---------------------------------
-    time_sim = time_sim(index);
     dt = time_sim(2)-time_sim(1);
+
     % -----------------
     % Inputs
     % -----------------
-    ped_0      = model_sim.inputs.ped_0.data(index);
-    delta_D    = model_sim.inputs.delta_D.data(index);
+    ped_0      = model_sim.inputs.ped_0.data;
+    delta_D    = model_sim.inputs.delta_D.data;
 
     % -----------------
     % States
     % -----------------
-    x_CoM      = model_sim.states.x.data(index);
-    y_CoM      = model_sim.states.y.data(index);
-    psi        = model_sim.states.psi.data(index);
-    u          = model_sim.states.u.data(index);
-    v          = model_sim.states.v.data(index);
-    Omega      = model_sim.states.Omega.data(index);
-    Fz_rr      = model_sim.states.Fz_rr.data(index);
-    Fz_rl      = model_sim.states.Fz_rl.data(index);
-    Fz_fr      =    model_sim.states.Fz_fr.data(index);
-    Fz_fl      =    model_sim.states.Fz_fl.data(index);
-    delta      =    model_sim.states.delta.data(index);
-    omega_rr   = model_sim.states.omega_rr.data(index);
-    omega_rl   = model_sim.states.omega_rl.data(index);
-    omega_fr   = model_sim.states.omega_fr.data(index);
-    omega_fl   = model_sim.states.omega_fl.data(index);
-    alpha_rr   = model_sim.states.alpha_rr.data(index);
-    alpha_rl   = model_sim.states.alpha_rl.data(index);
-    alpha_fr   = model_sim.states.alpha_fr.data(index);
-    alpha_fl   = model_sim.states.alpha_fl.data(index);
-    kappa_rr   = model_sim.states.kappa_rr.data(index);
-    kappa_rl   = model_sim.states.kappa_rl.data(index);
-    kappa_fr   = model_sim.states.kappa_fr.data(index);
-    kappa_fl   = model_sim.states.kappa_fl.data(index);
+    x_CoM      = model_sim.states.x.data;
+    y_CoM      = model_sim.states.y.data;
+    psi        = model_sim.states.psi.data;
+    u          = model_sim.states.u.data;
+    v          = model_sim.states.v.data;
+    Omega      = model_sim.states.Omega.data;
+    Fz_rr      = model_sim.states.Fz_rr.data;
+    Fz_rl      = model_sim.states.Fz_rl.data;
+    Fz_fr      = model_sim.states.Fz_fr.data;
+    Fz_fl      = model_sim.states.Fz_fl.data;
+    delta      = model_sim.states.delta.data;
+    % omega_rr   = model_sim.states.omega_rr.data;
+    % omega_rl   = model_sim.states.omega_rl.data;
+    % omega_fr   = model_sim.states.omega_fr.data;
+    % omega_fl   = model_sim.states.omega_fl.data;
+    alpha_rr   = model_sim.states.alpha_rr.data;
+    alpha_rl   = model_sim.states.alpha_rl.data;
+    alpha_fr   = model_sim.states.alpha_fr.data;
+    alpha_fl   = model_sim.states.alpha_fl.data;
+    % kappa_rr   = model_sim.states.kappa_rr.data;
+    % kappa_rl   = model_sim.states.kappa_rl.data;
+    % kappa_fr   = model_sim.states.kappa_fr.data;
+    % kappa_fl   = model_sim.states.kappa_fl.data;
 
     % -----------------
     % Extra Parameters
     % -----------------
-    Tw_rr      = model_sim.extra_params.Tw_rr.data(index);
-    Tw_rl      = model_sim.extra_params.Tw_rl.data(index);
-    Tw_fr      = model_sim.extra_params.Tw_fr.data(index);
-    Tw_fl      = model_sim.extra_params.Tw_fl.data(index);
-    Fx_rr      = model_sim.extra_params.Fx_rr.data(index);
-    Fx_rl      = model_sim.extra_params.Fx_rl.data(index);
-    Fx_fr      = model_sim.extra_params.Fx_fr.data(index);
-    Fx_fl      = model_sim.extra_params.Fx_fl.data(index);
-    Fy_rr      = model_sim.extra_params.Fy_rr.data(index);
-    Fy_rl      = model_sim.extra_params.Fy_rl.data(index);
-    Fy_fr      = model_sim.extra_params.Fy_fr.data(index);
-    Fy_fl      = model_sim.extra_params.Fy_fl.data(index);
-    Mz_rr      = model_sim.extra_params.Mz_rr.data(index);
-    Mz_rl      = model_sim.extra_params.Mz_rl.data(index);
-    Mz_fr      = model_sim.extra_params.Mz_fr.data(index);
-    Mz_fl      = model_sim.extra_params.Mz_fl.data(index);
-    gamma_rr   = model_sim.extra_params.gamma_rr.data(index);
-    gamma_rl   = model_sim.extra_params.gamma_rl.data(index);
-    gamma_fr   = model_sim.extra_params.gamma_fr.data(index);
-    gamma_fl   = model_sim.extra_params.gamma_fl.data(index);
-    delta_fr   = model_sim.extra_params.delta_fr.data(index);
-    delta_fl   = model_sim.extra_params.delta_fl.data(index);
+    % Tw_rr      = model_sim.extra_params.Tw_rr.data;
+    % Tw_rl      = model_sim.extra_params.Tw_rl.data;
+    % Tw_fr      = model_sim.extra_params.Tw_fr.data;
+    % Tw_fl      = model_sim.extra_params.Tw_fl.data;
+    % Fx_rr      = model_sim.extra_params.Fx_rr.data;
+    % Fx_rl      = model_sim.extra_params.Fx_rl.data;
+    % Fx_fr      = model_sim.extra_params.Fx_fr.data;
+    % Fx_fl      = model_sim.extra_params.Fx_fl.data;
+    Fy_rr      = model_sim.extra_params.Fy_rr.data;
+    Fy_rl      = model_sim.extra_params.Fy_rl.data;
+    Fy_fr      = model_sim.extra_params.Fy_fr.data;
+    Fy_fl      = model_sim.extra_params.Fy_fl.data;
+    % Mz_rr      = model_sim.extra_params.Mz_rr.data;
+    % Mz_rl      = model_sim.extra_params.Mz_rl.data;
+    % Mz_fr      = model_sim.extra_params.Mz_fr.data;
+    % Mz_fl      = model_sim.extra_params.Mz_fl.data;
+    % gamma_rr   = model_sim.extra_params.gamma_rr.data;
+    % gamma_rl   = model_sim.extra_params.gamma_rl.data;
+    % gamma_fr   = model_sim.extra_params.gamma_fr.data;
+    % gamma_fl   = model_sim.extra_params.gamma_fl.data;
+    delta_fr   = model_sim.extra_params.delta_fr.data;
+    delta_fl   = model_sim.extra_params.delta_fl.data;
     delta_use  = deg2rad(delta_fr+delta_fl)*0.5; % Average Steering Angle in radians
 
     % Chassis side slip angle beta [rad]
@@ -117,14 +118,10 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     rho_ss   = Omega./vG;
 
     % ---------------------------------
-    %% Cut in time
-    index = time_sim>cut_time; %cutting from 20 to end
-
-    % ---------------------------------
     %% Lateral Load Transfer
     % --------------------------
     e_phi = K_sf/(K_sf+K_sr); %Roll stiffness ratio
-    fake_Ay = linspace(min(Ay_ss),max(Ay_ss),length(Ay_ss))';
+    fake_Ay = linspace(0,max(Ay_ss),length(Ay_ss))';
 
     dFz_f_n = m_s.*fake_Ay.*((Lr*h_rf)/(L*Wf) + h_s/Wf*e_phi); % Nominal
     dFz_r_n = m_s.*fake_Ay.*((Lf*h_rr)/(L*Wr) + h_s/Wr*(1-e_phi));
@@ -147,17 +144,22 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
 
     f = figure('Name','Lateral Load Transfer in Ay');
     hold on
-    plot(fake_Ay,dFz_f_n)
-    plot(fake_Ay,dFz_r_n)
+    plot(fake_Ay,dFz_f_n, 'r--')
+    plot(fake_Ay,dFz_r_n, 'b--')
+    plot(fake_Ay,dFz_f, 'r')
+    plot(fake_Ay,dFz_r, 'b')
     xlabel('$a_y [m/s^2]$')
     ylabel({'$\Delta Fz_f$,$\Delta Fz_r$ [N]'})
-    legend('Front','Ru [km/h]ear')
+    legend('FN','RN','FR','RR','Location','best')
     title('Lateral Load Transfer in Ay')
     exportgraphics(f,'Graphs/LateralLoadTransfAy.eps')
     hold off
     % --------------------------
     %% Normalized Axle Characteristics
     % --------------------------------
+    idx = time_sim>5;
+    
+
     % Side Slip Angles
     alpha_f = 0.5.*deg2rad(alpha_fr + alpha_fl); % Simulated
     alpha_r = 0.5.*deg2rad(alpha_rr + alpha_rl); 
@@ -188,7 +190,7 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     mu_f = Y_f./Fz_f;
     mu_r = Y_r./Fz_r;
 
-    % Normalized Cornering Stiffnesses
+    % Normalized Cornering Stiffnesses  -> they are close to zero
     Cy_f = gradient(mu_f);
     Cy_r = gradient(mu_r);
 
@@ -247,14 +249,16 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     % ->  delta_Ack = rho_ss*L/tau_H   (when Dalpha=0)
 
     idx = Dalpha>6.2*1e-4;
-    Ay_ss_aux = Ay_ss(idx); % cut
-    Dalpha_aux = -Dalpha(idx); % cut
+    Ay_ss_aux = Ay_ss; % cut
+    Dalpha_aux = -Dalpha; % cut
 
     % Interpolate tangent
-    x_aux = [0,Ay_ss_aux(1)];
-    y_aux = [0,Dalpha_aux(1)];
-    p = polyfit(x_aux,y_aux,1);
-    linetg = polyval(p,fake_Ay);
+    % x_aux = [0,Ay_ss];
+    % y_aux = [0,Dalpha_aux];
+    % p = polyfit(x_aux,y_aux,1);
+    p2 = polyfit(Ay_ss_aux,Dalpha_aux,1);
+    % linetg = polyval(p,fake_Ay);
+    linetg2 = polyval(p2,fake_Ay);
 
     f = figure('Name','Steering Characteristics');
     tiledlayout(2,2)
@@ -262,7 +266,8 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     nexttile([1,2])
     hold on
     plot(Ay_ss_aux./g,Dalpha_aux,'r','LineWidth',1.5)
-    plot(fake_Ay./g,linetg,'b--')
+    % plot(fake_Ay./g,linetg,'b--')
+    plot(fake_Ay./g,linetg2,'c--')
     yline(0,'g','LineWidth',1)
     xlim([0,0.9])
     ylim('padded')
@@ -276,7 +281,7 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     % Curvature
     nexttile(3)
     hold on
-    plot(Ay_ss_aux/g,rho_ss(idx))
+    plot(Ay_ss_aux(idx)/g,rho_ss(idx))
 %     temp = gradient(rho_ss(idx));
 %     tt = rho_ss(idx);
 %     plot(Ay_ss_aux/g,temp(1).*Ay_ss_aux/g+tt,'b--')
@@ -289,7 +294,7 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
  
     % Radius
     nexttile(4)
-    plot(Ay_ss_aux/g,1./rho_ss(idx))
+    plot(Ay_ss_aux(idx)/g,1./rho_ss(idx))
     yline(L/deg2rad(mean(delta_D))*tau_D,'g')
     xlabel('$\frac{a_y}{g}$')
     ylabel('$R [m]$')
@@ -314,16 +319,17 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     % --------------------------------
 
     % Theoretical
-    Kus = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
+    Kus_a = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
     % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
-    % -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
+    % Kus_b = -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 
-    disp('$K_{us} = $',num2str(Kus))
-    disp('$K_{US} = $',num2str(p(1)))
+    disp(['Computed Understeering Gradient','Kus_a = ',num2str(Kus_a)])
+    % disp(['Computed Understeering Gradient','Kus_b = ',num2str(Kus_b)])
+    disp(['From Handling Diagram','KUS = ',num2str(p2(1))])
 
     % Fitted
     % Kus_fit = gradient(delta_use(idx));
-    % 
+    
     % % Plot
     % f = figure('Name','Understeering Gradient');
     % hold on
@@ -340,12 +346,16 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     % --------------------------------
     %% Yaw Rate Gain
     % slide99----------------------------
-    YR_gain = rho_ss.*u./delta_use; %Omega./delta;
+    % YR_gain = rho_ss.*u./delta_use; %Omega./delta;
+    % YR_gain = Omega./delta_use;
+
+
+    YR_gain = u./L.*(1+p2(1).*u.^2);
 
     f = figure('Name','Yaw Rate Gain');
-    plot(u(idx),YR_gain(idx),'r')
+    plot(u,YR_gain,'b')
     hold on
-    plot(u(idx),u(idx)./L,'g')
+    plot(u,u./L,'g')
     xlabel('$u [m/s]$')
     ylabel('$\frac{\Omega}{\delta}$')
     legend('Vehicle','Neutral')
@@ -356,13 +366,18 @@ function handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time)
     % --------------------------------
     %% Body Slip Gain
     % slide101---------------------------
-    BS_gain = beta./delta_use;
-    beta_neutral = rad2deg(Lr/L*delta_use*tau_H - (alpha_f+alpha_r));
+    
+    % beta_gain = Lr/L* 
 
+    % BS_gain = beta./delta_use;
+    % beta_neutral = rad2deg(Lr/L*delta_use*tau_H - (alpha_f+alpha_r));
+    
+    BS_gain = Lr/L - m/L^3*((Lf^2/Cy_r)+(Lr^2/Cy_f))*u.^2./(1+p2(1).*u.^2); %More like BS_gain
+    beta_neutral = Lr/L - m/L^3*((Lf^2/Cy_r)+(Lr^2/Cy_f))*u.^2./(1+Kus_a.*u.^2);
     f = figure('Name','Body Slip Gain');
-    plot(u(idx),BS_gain(idx))
+    plot(u,BS_gain,'b')
     hold on
-    plot(u(idx),beta_neutral(idx),'g')
+    plot(u,beta_neutral,'g')
     xlabel('$u [m/s]$')
     ylabel('$\frac{\beta}{\delta}$')
     legend('Vehicle','Neutral')

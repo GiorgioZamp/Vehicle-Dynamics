@@ -126,10 +126,10 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     % Post-Processing
     % ----------------------------
-    cut_time = 20; %[s]
-    dataAnalysisSteerCut(model_sim,vehicle_data,Ts,cut_time);
+  
+    dataAnalysis(model_sim,vehicle_data,Ts);
 
-    handling_diagramSteerCut(model_sim,vehicle_data,Ts,cut_time); % MY FUNCTION
+    handling_diagramSteer(model_sim,vehicle_data);
 
     % vehicleAnimation(model_sim,vehicle_data,Ts);
 
