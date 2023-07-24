@@ -259,6 +259,7 @@ function handling_diagramSteer(model_sim,vehicle_data)
     p2 = polyfit(Ay_ss_aux,Dalpha_aux,1);
     % linetg = polyval(p,fake_Ay);
     linetg2 = polyval(p2,fake_Ay);
+    Kus_fit = p2(1);
 
     f = figure('Name','Steering Characteristics');
     tiledlayout(2,2)
@@ -269,7 +270,6 @@ function handling_diagramSteer(model_sim,vehicle_data)
     % plot(fake_Ay./g,linetg,'b--')
     plot(fake_Ay./g,linetg2,'c--')
     yline(0,'g','LineWidth',1)
-    xlim([0,0.9])
     ylim('padded')
     xlabel('$\frac{a_y}{g}$')
     ylabel('$-\Delta\alpha$')
@@ -316,29 +316,13 @@ function handling_diagramSteer(model_sim,vehicle_data)
     % --------------------------------
 
     % Theoretical
-    Kus_a = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
+    Kus_th = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
     % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
     % Kus_b = -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 
-    disp(['Computed Understeering Gradient','Kus_a = ',num2str(Kus_a)])
+    disp(['Computed Understeering Gradient ','Kus_a = ',num2str(Kus_th)])
     % disp(['Computed Understeering Gradient','Kus_b = ',num2str(Kus_b)])
-    disp(['From Handling Diagram','KUS = ',num2str(p2(1))])
-
-    % Fitted
-    % Kus_fit = gradient(delta_use(idx));
-    
-    % % Plot
-    % f = figure('Name','Understeering Gradient');
-    % hold on
-    % plot(fake_Ay,Kus.*fake_Ay)
-    % plot(fake_Ay,mean(Kus_fit(1:10)).*fake_Ay)
-    % hold off
-    % exportgraphics(f,'Graphs/UndersteeringGrad.eps')
-
-    % p(1) is the slope of the tangent we computed in the handling
-    % characteristics
-
-
+    disp(['From Handling Diagram ','KUS = ',num2str(Kus_fit)])
 
     % --------------------------------
     %% Yaw Rate Gain
@@ -347,10 +331,10 @@ function handling_diagramSteer(model_sim,vehicle_data)
     % YR_gain = Omega./delta_use;
 
 
-    YR_gain = u./L.*(1+p2(1).*u.^2);
+    YR_gain = u./(L.*(1+Kus_fit.*u.^2));
 
     f = figure('Name','Yaw Rate Gain');
-    plot(u,YR_gain,'b')
+    plot(u,YR_gain,'r')
     hold on
     plot(u,u./L,'g')
     xlabel('$u [m/s]$')
@@ -360,27 +344,33 @@ function handling_diagramSteer(model_sim,vehicle_data)
     hold off
     exportgraphics(f,'Graphs/yawrategain.eps')
 
+    u_ch = 1/sqrt(abs(Kus_th)); 
+    fprintf("Characteristic speed u_ch = %4.2f m/s \n",u_ch)
+
     % --------------------------------
     %% Body Slip Gain
     % slide101---------------------------
-    
-    % beta_gain = Lr/L* 
 
-    % BS_gain = beta./delta_use;
-    % beta_neutral = rad2deg(Lr/L*delta_use*tau_H - (alpha_f+alpha_r));
+    BS_gain = beta./delta;
+    % BS_gain = Lr/L - (alpha_r*Lf+alpha_f*Lr)./(L*delta_use);
+    BS_neutral = Lr/L - alpha_f./delta;
+
     
-    BS_gain = Lr/L - m/L^3*((Lf^2/Cy_r)+(Lr^2/Cy_f))*u.^2./(1+p2(1).*u.^2); %More like BS_gain
-    beta_neutral = Lr/L - m/L^3*((Lf^2/Cy_r)+(Lr^2/Cy_f))*u.^2./(1+Kus_a.*u.^2);
+    % BS_gain = Lr/L - (m/L^3)*((Lf^2/Cy_r)+(Lr^2/Cy_f))*u.^2./(1+p2(1).*u.^2); %More like BS_gain
+    % BS_gain = Lr/L - m/(L^3)*(Lf/Cy_r+Lr/Cy_f)'.*(u.^2)./(1+Kus_fit.*u.^2);
+    % beta_neutral = Lr/L - m/(L^3)*((Lf^2/Cy_r)+(Lr^2/Cy_f))*u.^2./(1+Kus_a.*u.^2);
+    % BS_neutral = Lr/L - m/(L^3)*(Lf/Cy_r+Lr/Cy_f)'.*(u.^2);
+
     f = figure('Name','Body Slip Gain');
-    plot(u,BS_gain,'b')
+    plot(u,BS_gain,'r')
     hold on
-    plot(u,beta_neutral,'g')
+    plot(u,BS_neutral,'g')
     xlabel('$u [m/s]$')
     ylabel('$\frac{\beta}{\delta}$')
     legend('Vehicle','Neutral')
     title('Body Slip Gain')
     hold off
-    exportgraphics(f,'Graphs/bodyslipgain.eps')
+    exportgraphics(f,'Graphs/BodySlipGain.eps')
 
     % --------------------------------
 end

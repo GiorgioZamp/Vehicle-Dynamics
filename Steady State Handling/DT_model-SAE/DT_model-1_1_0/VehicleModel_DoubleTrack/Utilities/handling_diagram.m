@@ -175,8 +175,8 @@ function handling_diagram(model_sim,vehicle_data,flg)
     Fy_r = Fy_rr + Fy_rl;
 
     % Computed Axle Lateral Forces
-%     Fy_f_t = m.*fake_Ay.*Lr/L;
-%     Fy_r_t = m.*fake_Ay.*Lf/L;
+    Y_f_t = m.*fake_Ay.*Lr/L;
+    Y_r_t = m.*fake_Ay.*Lf/L;
 
     % Axle Characteristics
     Y_f = m*Ay_ss*Lr/L;
@@ -185,6 +185,8 @@ function handling_diagram(model_sim,vehicle_data,flg)
     % Normalized Axle Characteristics
     mu_f = Y_f./Fz_f;
     mu_r = Y_r./Fz_r;
+    mu_f_t = Y_f_t./Fz_f;
+    mu_r_t = Y_r_t./Fz_r;
 
     % Normalized Cornering Stiffnesses  -> they are close to zero
     Cy_f = gradient(mu_f);
@@ -219,6 +221,8 @@ function handling_diagram(model_sim,vehicle_data,flg)
     hold on
     plot(alpha_f,Fy_f,'b')
     plot(alpha_r,Fy_r,'r')
+    plot(alpha_f,Y_f_t,'b--')
+    plot(alpha_r,Y_r_t,'r--')
     xlabel('$\alpha [rad]$')
     ylabel({'$Fy_f$,$Fy_r$'})
     legend('$Fy_f$','$Fy_r$','Location','best')
@@ -230,6 +234,8 @@ function handling_diagram(model_sim,vehicle_data,flg)
     hold on
     plot(alpha_f,mu_f,'b')
     plot(alpha_r,mu_r,'r')
+    plot(alpha_f,mu_f_t,'b--')
+    plot(alpha_r,mu_r_t,'r--')
     xlabel('$\alpha_f , \alpha_r [rad]$')
     ylabel({'$\mu_f$,$\mu_r$'})
     title('Normalized Axle Characteristics')
@@ -251,12 +257,11 @@ function handling_diagram(model_sim,vehicle_data,flg)
         Dalpha_aux = -Dalpha(idx); % cut
 
         % Interpolate tangent
-        x_aux = [0,Ay_ss_aux(1)];
-        y_aux = [0,Dalpha_aux(1)];
-        p = polyfit(x_aux,y_aux,1);
-        p2 = polyfit([Ay_ss_aux(1),Ay_ss_aux(10000)],[Dalpha_aux(1),Dalpha_aux(10000)],1);
+        p = polyfit([0,Ay_ss_aux(1:ceil(end/4))'],[0,Dalpha_aux(1:ceil(end/4))'],1);
+        p1 = polyfit(Ay_ss_aux,Dalpha_aux,1);
+        Kus_fit = p(1);
         linetg = polyval(p,fake_Ay);
-        linetg2 = polyval(p2,fake_Ay);
+        linetg1 = polyval(p1,fake_Ay);
 
         f = figure('Name','Steering Characteristics');
         tiledlayout(2,2)
@@ -265,9 +270,8 @@ function handling_diagram(model_sim,vehicle_data,flg)
         hold on
         plot(Ay_ss_aux./g,Dalpha_aux,'r','LineWidth',1.5)
         plot(fake_Ay./g,linetg,'b--')
-        plot(fake_Ay./g,linetg2,'c--')
+        plot(fake_Ay./g,linetg1,'c--','LineWidth',1.5)
         yline(0,'g','LineWidth',1)
-        xlim([0,0.9])
         ylim('padded')
         xlabel('$\frac{a_y}{g}$')
         ylabel('$-\Delta\alpha$')
@@ -350,19 +354,19 @@ function handling_diagram(model_sim,vehicle_data,flg)
     % --------------------------------
 
     % Theoretical
-    Kus_a = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
+    Kus_th = -m/(L^2)*(Lf/K_sr - Lr/K_sf);
     % -m/(L*tau_H)*(Lf/K_sr - Lr/K_sf);
     % Kus_b = -1/(L*tau_H*g)*(1/Cy_r - 1/Cy_f);
 
-    disp(['Computed Understeering Gradient ','Kus_a = ',num2str(Kus_a)])
+    disp(['Computed Understeering Gradient ','Kus_a = ',num2str(Kus_th)])
     % disp(['Computed Understeering Gradient','Kus_b = ',num2str(Kus_b)])
-    disp(['From Handling Diagram ','KUS = ',num2str(p2(1))])
+    disp(['From Handling Diagram ','KUS = ',num2str(Kus_fit)])
 
     % --------------------------------
     %% Yaw Rate Gain
     % slide99----------------------------
     % YR_gain = rho_ss.*u./delta_use;
-    YR_gain = u./(L*(1+p2(1)*u.^2));
+    YR_gain = u./(L*(1+Kus_fit*u.^2));
 
     if flg == 1
         f = figure('Name','Yaw Rate Gain');
@@ -394,13 +398,14 @@ function handling_diagram(model_sim,vehicle_data,flg)
     %% Body Slip Gain
     % slide101---------------------------
     BS_gain = beta./delta_use;
-    beta_neutral = rad2deg(Lr/L*delta_use*tau_H - (alpha_f+alpha_r));
+    BS_neutral = Lr/L - alpha_f./delta;
+    idx = time_sim>1;
 
     if flg == 1
         f = figure('Name','Body Slip Gain');
         plot(u(idx),BS_gain(idx))
         hold on
-        plot(u(idx),beta_neutral(idx),'g')
+        plot(u(idx),BS_neutral(idx),'g')
         xlabel('$u [m/s]$')
         ylabel('$\frac{\beta}{\delta}$')
         legend('Vehicle','Neutral')

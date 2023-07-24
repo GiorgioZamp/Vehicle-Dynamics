@@ -37,14 +37,14 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     % Define initial conditions for the simulation
     % ----------------------------
-    V0 = 50/3.6;        % [m/s] Initial speed
+    V0 = 30/3.6;        % [m/s] Initial speed
     X0 = loadInitialConditions(V0);
     steer_des = 10;     % [°] desired steer angle
     % ----------------------------
     % Define the desired speed
     % ----------------------------
     V_des = 30/3.6; % Desired speed for controller (kept for ease)
-    slope = 0.25;    % Slope of speed ramp [m/s^2]
+    slope = 0.5;    % Slope of speed ramp [m/s^2]
 
     % ----------------------------
     % Simulation parameters
