@@ -32,7 +32,7 @@ cc = jet(length(camber_set));
 f = figure('Name','Camber Effect');
 hold on;
 for i = 1:length(camber_set)
-    plot((datasets{1,i}.Ay_n)./9.81, -datasets{1,i}.Dalpha,'Color',cc(i,:))
+    plot(datasets{1,i}.nAy_n, -datasets{1,i}.Dalpha,'Color',cc(i,:))
     leg{i} = ['$\gamma\;$',num2str(camber_set(i))];
 end
 xlabel('$\frac{a_y}{g}$')

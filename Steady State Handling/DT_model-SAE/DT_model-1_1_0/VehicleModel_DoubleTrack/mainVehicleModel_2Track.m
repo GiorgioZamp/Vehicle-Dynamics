@@ -18,6 +18,7 @@
 clc
 close all
 clear
+
 initialize_environment;
 % ----------------------------
 %% Load vehicle data
@@ -37,14 +38,14 @@ vehicle_data = getVehicleDataStruct();
     % ----------------------------
     % Define initial conditions for the simulation
     % ----------------------------
-    V0 = 30/3.6;        % [m/s] Initial speed
+    V0 = 0/3.6;        % [m/s] Initial speed
     X0 = loadInitialConditions(V0);
-    steer_des = 10;     % [°] desired steer angle
+    steer_des = 20;     % [°] desired steer angle
     % ----------------------------
     % Define the desired speed
     % ----------------------------
-    V_des = 30/3.6; % Desired speed for controller (kept for ease)
-    slope = 0.5;    % Slope of speed ramp [m/s^2]
+    V_des = 70/3.6; % Desired speed for controller (kept for ease)
+    slope = 0.2;    % Slope of speed ramp [m/s^2]
 
     % ----------------------------
     % Simulation parameters
@@ -74,10 +75,12 @@ vehicle_data = getVehicleDataStruct();
 % ----------------------------
 %% Camber, Toe Angle and Roll Stiffness Effects
     %% Camber Effect
+    vehicle_data = getVehicleDataStruct();
     camber_set = -10:2:+10; % [deg] camber angle
     camber_effect(camber_set,vehicle_data)
 
     %% Toe Effect
+    vehicle_data = getVehicleDataStruct();
     toe_set = -3:1:+3; % [deg] toe angle
     toe_effect(toe_set,vehicle_data)
 
@@ -85,11 +88,13 @@ vehicle_data = getVehicleDataStruct();
 	% Vary Roll Stiffnesses ratio
 	% e_phi->1 all to the front
 	% e_phi->0 all to the back
-    e_phi = [0.2,0.3,0.4,0.6,0.7,0.8]; % default was 0.44
+    vehicle_data = getVehicleDataStruct();
+    e_phi = [0.2,0.4,0.6,0.8]; % default was 0.44
     rollstiff_effect(e_phi,vehicle_data)
 
     % ----------------------------
 %% STEER RAMP TEST
+
 % ----------------------------
     flg = 2; % flag for simulation profile selection
 
