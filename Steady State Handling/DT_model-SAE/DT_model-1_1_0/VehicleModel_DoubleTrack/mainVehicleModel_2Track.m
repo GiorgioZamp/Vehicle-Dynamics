@@ -107,8 +107,8 @@ vehicle_data = getVehicleDataStruct();
     % Define the desired steer
     % ----------------------------
     V_des = 50/3.6; % Desired speed for controller
-    steer_des = 0;     % [°] desired steer angle
-    slope = 0.5;    % Slope of steer ramp
+    steer_des = 20;     % [°] desired steer angle
+    slope = 0.25;    % Slope of steer ramp
 
     % ----------------------------
     % Simulation parameters
@@ -134,19 +134,19 @@ vehicle_data = getVehicleDataStruct();
   
     dataAnalysis(model_sim,vehicle_data,Ts);
 
-    handling_diagramSteer(model_sim,vehicle_data);
+    handling_diagram(model_sim,vehicle_data,flg);
 
     % vehicleAnimation(model_sim,vehicle_data,Ts);
 
     % ----------------------------
 
     %% Camber Effect
-    camber_set = -4:2:+4; % [deg] camber angle
+    camber_set = -8:2:+8; % [deg] camber angle
     vehicle_data = getVehicleDataStruct();
     camber_effect(camber_set,vehicle_data)
 
     %% Toe Effect
-    toe_set = -3:1:+3; % [deg] toe angle
+    toe_set = -1:0.5:+1; % [deg] toe angle
     vehicle_data = getVehicleDataStruct();
     toe_effect(toe_set,vehicle_data)
 
@@ -154,6 +154,6 @@ vehicle_data = getVehicleDataStruct();
     % Vary Roll Stiffnesses ratio
     % e_phi->1 all to the front
     % e_phi->0 all to the back
-    e_phi = [0.2,0.3,0.4,0.5,0.6,0.7,0.8]; % default was 0.44
+    e_phi = [0.2,0.4,0.6,0.8]; % default was 0.44
     vehicle_data = getVehicleDataStruct();
     rollstiff_effect(e_phi,vehicle_data)

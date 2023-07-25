@@ -38,7 +38,7 @@ function handling_diagram(model_sim,vehicle_data,flg)
     dt = time_sim(2)-time_sim(1);
 
     % cutting index
-    idx = time_sim>21;
+    idx = time_sim>30;
 
     time_sim = time_sim(idx);
 
@@ -191,16 +191,18 @@ function handling_diagram(model_sim,vehicle_data,flg)
     % --------------------------------
 
     % Side Slip Angles
-    alpha_f = 0.5.*deg2rad(alpha_fr_ss + alpha_fl_ss); % Simulated
-    alpha_r = 0.5.*deg2rad(alpha_rr_ss + alpha_rl_ss); 
+    % alpha_f = 0.5.*deg2rad(alpha_fr_ss + alpha_fl_ss); % Simulated
+    % alpha_r = 0.5.*deg2rad(alpha_rr_ss + alpha_rl_ss); 
 
-    alpha_f_n = delta_ss - beta_ss - rho_ss.*Lf; % Analytical
-    alpha_r_n = -beta_ss + rho_ss.*Lr;
+    alpha_f = delta_ss - (v_ss + Omega_ss.*Lf)./u_ss; % Analytical
+    alpha_r = - (v_ss - Omega_ss.*Lr)./u_ss;
     Dalpha = alpha_r - alpha_f;
 
     % Axle Normal Loads
     Fz_f = Fz_fl_ss + Fz_fr_ss;
     Fz_r = Fz_rl_ss + Fz_rr_ss;
+    Fz_f0 = m*g*Lr/L;
+    Fz_r0 = m*g*Lf/L;
 
     % Simulation Axle Lateral Forces
     Fy_f = sin(delta_fl_ss).*Fx_fl_ss + cos(delta_fl_ss).*Fy_fl_ss + sin(delta_fr_ss).*Fx_fr_ss + cos(delta_fr_ss).*Fy_fr_ss;
@@ -211,8 +213,8 @@ function handling_diagram(model_sim,vehicle_data,flg)
     Y_r = m*Ay_ss*Lf/L;
 
     % Normalized Axle Characteristics
-    mu_f = Y_f./Fz_f;
-    mu_r = Y_r./Fz_r;
+    mu_f = Y_f./Fz_f0;
+    mu_r = Y_r./Fz_r0;
 
     % Normalized Cornering Stiffnesses  -> they are close to zero
     Cy_f = diff(mu_f)./diff(alpha_f);
@@ -306,7 +308,7 @@ function handling_diagram(model_sim,vehicle_data,flg)
         hold off
         xlabel('$\frac{a_y}{g}$')
         ylabel('$\rho [1/m]$')
-        xlim([0.02,inf])
+        % xlim([0.02,inf])
         ylim('padded')
         title('Curvature')
 
@@ -316,7 +318,7 @@ function handling_diagram(model_sim,vehicle_data,flg)
         yline(L/deg2rad(mean(delta_D))*tau_D,'g')
         xlabel('$\frac{a_y}{g}$')
         ylabel('$R [m]$')
-        xlim([0.02,inf])
+        % xlim([0.02,inf])
         ylim('padded')
         title('Radius')
 
@@ -324,9 +326,9 @@ function handling_diagram(model_sim,vehicle_data,flg)
 
     elseif flg == 2
         Dalpha_aux = -Dalpha;
-        Dalpha_aux(1)=0;
+        % Dalpha_aux(1)=0;
 
-        idx = normAy_ss<0.35;
+        idx = normAy_ss<0.1;
 
         % Interpolate tangent
         p = polyfit(normAy_ss(idx),Dalpha_aux(idx),1);
@@ -350,23 +352,18 @@ function handling_diagram(model_sim,vehicle_data,flg)
 
         % Curvature
         nexttile(3)
-        hold on
         plot(normAy_ss,rho_ss)
-        yline(deg2rad(mean(delta_D))./(L*tau_D),'g')
         hold off
         xlabel('$\frac{a_y}{g}$')
         ylabel('$\rho [1/m]$')
-        xlim([0.02,inf])
         ylim('padded')
         title('Curvature')
 
         % Radius
         nexttile(4)
         plot(normAy_ss,1./rho_ss)
-        yline(L/deg2rad(mean(delta_D))*tau_D,'g')
         xlabel('$\frac{a_y}{g}$')
         ylabel('$R [m]$')
-        xlim([0.02,inf])
         ylim('padded')
         title('Radius')
 
@@ -393,23 +390,19 @@ function handling_diagram(model_sim,vehicle_data,flg)
     Kus_th_lin = Kus_th_lin(end);
 
     disp(['Theoretical Understeering Gradient ','Kus_th = ',num2str(Kus_th_lin)])
-    disp(['Computed Understeering Gradient','Kus_prac = ',num2str(Kus_prac_lin)])
+    disp(['Computed Understeering Gradient ','Kus_prac = ',num2str(Kus_prac_lin)])
     disp(['From Handling Diagram ','KUS = ',num2str(Kus_fit)])
 
-    % figure
-    % hold on 
-    % plot(normAy_ss(1:end-1),Kus_prac)
-    % plot(normAy_ss(1:end-1),Kus_th)
-    % hold off
-
+% Kus_th = -0.002481
+% Kus_fit = -0.0034039
     % --------------------------------
     %% Yaw Rate Gain
     % slide99----------------------------
     YR_gain = Omega_ss./delta_ss;
-    % YR_gain = u_ss./(L*(1+Kus_fit*u_ss.^2));
+    % YR_gain = u./(L*(1+Kus_fit*u.^2));
     % YR_gain = rho_ss.*u_ss./delta_ss;
 
-    if flg == 1
+    % if flg == 1
         f = figure('Name','Yaw Rate Gain');
         plot(u_ss,YR_gain,'r')
         hold on
@@ -420,20 +413,20 @@ function handling_diagram(model_sim,vehicle_data,flg)
         title('Yaw Rate Gain')
         hold off
         exportgraphics(f,'Graphs/yawrategain.eps')
-    elseif flg == 2
-        f = figure('Name','Yaw Rate Gain');
-        plot(u_ss,YR_gain,'r')
-        hold on
-        plot(u_ss,u_ss./L,'g')
-        xlabel('$u [m/s]$')
-        ylabel('$\frac{\Omega}{\delta}$')
-        legend('Vehicle','Neutral')
-        title('Yaw Rate Gain')
-        hold off
-        exportgraphics(f,'Graphs/YawRateGainSteer.eps')
-    else
-        error('Test Flag Not Defined')
-    end
+    % elseif flg == 2
+    %     f = figure('Name','Yaw Rate Gain');
+    %     plot(u_ss,YR_gain,'r')
+    %     hold on
+    %     plot(u_ss,u_ss./L,'g')
+    %     xlabel('$u [m/s]$')
+    %     ylabel('$\frac{\Omega}{\delta}$')
+    %     legend('Vehicle','Neutral')
+    %     title('Yaw Rate Gain')
+    %     hold off
+    %     exportgraphics(f,'Graphs/YawRateGainSteer.eps')
+    % else
+    %     error('Test Flag Not Defined')
+    % end
 
     % --------------------------------
     %% Body Slip Gain
@@ -441,7 +434,7 @@ function handling_diagram(model_sim,vehicle_data,flg)
     BS_gain = beta_ss./delta_ss;
     BS_neutral = Lr/L - alpha_f./delta_ss;
 
-    if flg == 1
+    % if flg == 1
         f = figure('Name','Body Slip Gain');
         plot(u_ss,BS_gain)
         hold on
@@ -452,20 +445,20 @@ function handling_diagram(model_sim,vehicle_data,flg)
         title('Body Slip Gain')
         hold off
         exportgraphics(f,'Graphs/bodyslipgain.eps')
-    elseif flg == 2
-        f = figure('Name','Body Slip Gain');
-        plot(u_ss,BS_gain)
-        hold on
-        plot(u_ss,BS_neutral,'g')
-        xlabel('$u [m/s]$')
-        ylabel('$\frac{\beta}{\delta}$')
-        legend('Vehicle','Neutral')
-        title('Body Slip Gain')
-        hold off
-        exportgraphics(f,'Graphs/BodySlipGainSteer.eps')
-    else
-        error('Test Flag Not Defined')
-    end
+    % elseif flg == 2
+    %     f = figure('Name','Body Slip Gain');
+    %     plot(u_ss,BS_gain)
+    %     hold on
+    %     plot(u_ss,BS_neutral,'g')
+    %     xlabel('$u [m/s]$')
+    %     ylabel('$\frac{\beta}{\delta}$')
+    %     legend('Vehicle','Neutral')
+    %     title('Body Slip Gain')
+    %     hold off
+    %     exportgraphics(f,'Graphs/BodySlipGainSteer.eps')
+    % else
+    %     error('Test Flag Not Defined')
+    % end
 
     % --------------------------------
 end
