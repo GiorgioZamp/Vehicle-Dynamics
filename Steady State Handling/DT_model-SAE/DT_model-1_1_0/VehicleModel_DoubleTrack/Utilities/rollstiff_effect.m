@@ -35,22 +35,20 @@ end
 
 % Plots
 cc = winter(length(e_phi));
-idx = time_sim>10;
 
 % Handling Diagram
 f = figure('Name','Roll Stiffness Effect');
 hold on
 for i = 1:length(e_phi)
-    plot(datasets{1,i}.Ay_n./9.81, -rad2deg(datasets{1,i}.Dalpha),'Color',cc(i,:))
+    plot(datasets{1,i}.nAy_n, -datasets{1,i}.Dalpha,'Color',cc(i,:))
     leg{i} = ['$\epsilon_{\phi}\;$',num2str(e_phi(i))];
 end
 hold off
 xlabel('$\frac{a_y}{g}$')
 ylabel('$-\Delta\alpha$')
 legend(leg)
-xlim([0.0015,0.045])
 title('Handling Diagram in $\epsilon_{\phi}$')
-exportgraphics(f,'Graphs/RollStiffEffectSteer.eps')
+exportgraphics(f,'Graphs/RollStiffEffectSpeed.eps')
 
 %------------------------------------------------------------------------
 

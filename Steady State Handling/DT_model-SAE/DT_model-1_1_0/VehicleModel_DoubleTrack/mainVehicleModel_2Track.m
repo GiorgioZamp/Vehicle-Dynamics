@@ -81,7 +81,7 @@ vehicle_data = getVehicleDataStruct();
 
     %% Toe Effect
     vehicle_data = getVehicleDataStruct();
-    toe_set = -3:1:+3; % [deg] toe angle
+    toe_set = -1:0.5:+1; % [deg] toe angle
     toe_effect(toe_set,vehicle_data)
 
     %% Roll Stiffness Effect

@@ -29,7 +29,7 @@ function toe_effect(toe_set,vehicle_data)
     f = figure('Name','Toe Effect');
     hold on
     for i = 1:length(toe_set)
-        plot(datasets{1,i}.Ay_n./9.81, -datasets{1,i}.Dalpha,'Color',cc(i,:))
+        plot(datasets{1,i}.nAy_n, -datasets{1,i}.Dalpha,'Color',cc(i,:))
         leg{i} = ['$\delta_0$ ',num2str(toe_set(i))];
     end
     hold off
@@ -37,6 +37,6 @@ function toe_effect(toe_set,vehicle_data)
     ylabel('$-\Delta\alpha$')
     legend(leg)
     title('Handling Diagram in $\delta_0$')
-    exportgraphics(f,'Graphs/ToeEffectSteer.eps')
+    exportgraphics(f,'Graphs/ToeEffectSpeed.eps')
 
 end
